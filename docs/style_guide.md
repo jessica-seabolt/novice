@@ -1,0 +1,95 @@
+# NoVice GDScript Style Guide
+
+
+## Naming
+
+- snake_case for variables, functions, signals, and file names
+- PascalCase for class names, enums, and nodes
+- CONSTANT_CASE for constants and enum members
+- Private members prefixed with _
+- Signals are named as past-tense events: `room_generated`, `floor_completed`, not `generate_room` or `on_floor_complete`
+- Boolean variables/functions read as yes/no questions: `is_walkable`, `has_trap`, `can_spawn_here`
+- Avoid abbreviations unless they're standard (`pos`, `id` are fine; `rm_cfg` is not)
+
+## Privacy
+
+- Default everything to private
+- If a variable is only internal (e.g. `_rng`, `_room_rects`), keep it private
+- Only use public methods to access or mutate private data
+
+## Architecture
+
+- Favor composition over inheritance
+- Prefer small, focused classes with a single job
+- Functions do one task
+- Avoid god objects
+- Data-holding classes (`DungeonTile`, `DungeonGrid`) should be dumb where possible
+- Configurations should be a Resource
+
+## Typing
+
+- Use static typing everywhere unless untyped is necessary
+- Avoid type inference
+- Avoid :=
+- Type function returns explicitly, including -> void for functions with no return value
+
+## Comments
+
+- Only comment non-obvious implementation details
+- No comment is better than an obvious one
+- Keep comments concise and specific
+
+## Organization
+
+- One class per file
+- File name matches the class
+
+- Inside a file, order top to bottom:
+    01. @tool, @icon, @static_unload
+    02. class_name
+    03. extends
+    04. ## doc comment
+
+    05. signals
+    06. enums
+    07. constants
+    08. static variables
+    09. @export variables
+    10. remaining regular variables
+    11. @onready variables
+
+    12. _static_init()
+    13. remaining static methods
+    14. overridden built-in virtual methods:
+        1. _init()
+        2. _enter_tree()
+        3. _ready()
+        4. _process()
+        5. _physics_process()
+        6. remaining virtual methods
+    15. overridden custom methods
+    16. remaining methods
+    17. inner classes
+
+- Class methods and variables follow this order:
+    01. public
+    02. private
+
+## Signals and Globals
+
+- Prefer signals for "something happened" communication
+- Avoid globals when possible
+- Send signals through a global SignalBus to keep code decoupled
+
+## Enums
+
+- Prefer enums over raw strings/ints for anything with a fixed, known set of states
+- Prefer bitmasks when different states can be true or false simultaneously
+
+## Misc
+
+- Guard clauses over deep nesting
+- Return/continue early when possible and avoid if/else return statements
+- Use ternary statements (y if x else z) for simple if/else statements
+- Use match with enums
+- Magic numbers should be named constants
