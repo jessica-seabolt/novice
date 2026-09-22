@@ -1,9 +1,12 @@
 class_name CorridorCarver extends RefCounted
-## Carves straight L-shaped corridors between two points
+## Carves corridors between rooms using A* pathfinding
 
 const MAX_ATTEMPTS: int = 100
 
 
+## Asks A* for a route, then walks it as if carving it
+## Tiles cutting through a room or making a 2x2 ground square get blocked
+## Repeats until a clean route is found or MAX_ATTEMPTS is exhausted
 static func find_path(ctx: GenerationContext, start: Vector2i, goal: Vector2i) -> Array[Vector2i]:
     var temp_blocked: Array[Vector2i] = []
 
@@ -53,15 +56,15 @@ static func _unblock(astar: AStarGrid2D, blocked: Array[Vector2i]) -> void:
 
 static func build_astar(ctx: GenerationContext) -> void:
     var astar: AStarGrid2D = AStarGrid2D.new()
-    astar.region = Rect2i(0, 0, FloorGrid.WIDTH, FloorGrid.HEIGHT)
+    astar.region = Rect2i(0, 0, ctx.grid.width, ctx.grid.height)
     astar.cell_size = Vector2(1, 1)
     astar.diagonal_mode = AStarGrid2D.DIAGONAL_MODE_NEVER
     astar.default_compute_heuristic = AStarGrid2D.HEURISTIC_MANHATTAN
     astar.default_estimate_heuristic = AStarGrid2D.HEURISTIC_MANHATTAN
     astar.update()
 
-    for y: int in range(FloorGrid.HEIGHT):
-        for x: int in range(FloorGrid.WIDTH):
+    for y: int in range(ctx.grid.height):
+        for x: int in range(ctx.grid.width):
             var p: Vector2i = Vector2i(x, y)
             if ctx.grid.is_room(p):
                 astar.set_point_solid(p, true)

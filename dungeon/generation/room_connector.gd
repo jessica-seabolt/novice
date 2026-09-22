@@ -1,5 +1,5 @@
 class_name RoomConnector extends RefCounted
-## Links every placed room ordered by proximity
+## Connects rooms in a dungeon by carving corridors between them
 
 
 static func connect_rooms(ctx: GenerationContext) -> void:
@@ -12,6 +12,7 @@ static func connect_rooms(ctx: GenerationContext) -> void:
         CorridorCarver.carve_between(ctx, room_a, room_b)
 
 
+## Greedy walk from the leftmost room, linking each room to the nearest unvisited room
 static func _nearest_neighbour_order(rooms: Array[DungeonRoom]) -> Array[int]:
     var visited: Array[bool] = []
     visited.resize(rooms.size())

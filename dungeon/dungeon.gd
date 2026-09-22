@@ -1,9 +1,11 @@
 class_name Dungeon extends Node2D
+## Orchestrates one floor's generation pipeline: places rooms, connects them, then renders
 
 const TEST_CONFIG = preload("res://dungeon/config/dc_test.tres")
-@onready var tilemap_layer: TileMapLayer = $TileMapLayer
 var config: DungeonConfig
 var grid: FloorGrid
+@onready var tilemap_layer: TileMapLayer = $TileMapLayer
+
 
 func _ready() -> void:
     config = TEST_CONFIG
@@ -12,7 +14,9 @@ func _ready() -> void:
 
 func generate_floor() -> void:
     grid = FloorGrid.new()
-    grid.build()
+    var floor_width: int = floori(float(FloorGrid.MAX_WIDTH) * config.grid_usage)
+    var floor_height: int = floori(float(FloorGrid.MAX_HEIGHT) * config.grid_usage)
+    grid.build(floor_width, floor_height)
 
     var ctx: GenerationContext = GenerationContext.new(grid, config)
     RoomPlacer.place(ctx)

@@ -1,16 +1,21 @@
 class_name FloorGrid extends RefCounted
+## Represents a floor of a dungeon via a 2D array of DungeonTile objects
+## Provides utility functions for querying and modifying the grid
 
 const BORDER_SIZE: int = 2
-const WIDTH: int = 54
-const HEIGHT: int = 32
+const MAX_WIDTH: int = 84
+const MAX_HEIGHT: int = 52
+
+var width: int = 0
+var height: int = 0
 
 # Uses a 2D Array to store the grid
 var _tiles: Array[Array] = []
 
 
 func reset() -> void:
-    for y: int in range(HEIGHT):
-        for x: int in range(WIDTH):
+    for y: int in range(height):
+        for x: int in range(width):
             _tiles[y][x].reset()
     _enforce_border()
 
@@ -20,8 +25,8 @@ func get_tile(p: Vector2i) -> DungeonTile:
 
 
 func is_in_bounds(p: Vector2i) -> bool:
-    return p.x >= 0 and p.y >= 0 and p.x < WIDTH and p.y < HEIGHT
-    
+    return p.x >= 0 and p.y >= 0 and p.x < width and p.y < height
+
 
 func is_ground(p: Vector2i) -> bool:
     return _tiles[p.y][p.x].tile_type == DungeonTile.TileType.GROUND
@@ -35,15 +40,15 @@ func is_room(p: Vector2i) -> bool:
     return _tiles[p.y][p.x].room_id != -1
 
 
-# A ground tile that is not part of any room, i.e. a corridor
+## A ground tile that is not part of any room
 func is_hallway(p: Vector2i) -> bool:
     return is_ground(p) and not is_room(p)
-    
-    
+
+
 func count_ground_tiles() -> int:
     var count: int = 0
-    for y: int in range(HEIGHT):
-        for x: int in range(WIDTH):
+    for y: int in range(height):
+        for x: int in range(width):
             if _tiles[y][x].tile_type == DungeonTile.TileType.GROUND:
                 count += 1
     return count
@@ -56,12 +61,14 @@ func set_tile_type(p: Vector2i, type: DungeonTile.TileType) -> void:
     _tiles[p.y][p.x].tile_type = type
 
 
-func build() -> void:
+func build(new_width: int, new_height: int) -> void:
+    width = new_width
+    height = new_height
     _tiles.clear()
 
-    for y: int in range(HEIGHT):
+    for y: int in range(height):
         var row: Array = []
-        for x: int in range(WIDTH):
+        for x: int in range(width):
             row.append(DungeonTile.new())
         _tiles.append(row)
 
@@ -72,29 +79,31 @@ func is_border(p: Vector2i) -> bool:
     return (
         p.x < BORDER_SIZE
         or p.y < BORDER_SIZE
-        or p.x >= (WIDTH - BORDER_SIZE)
-        or p.y >= (HEIGHT - BORDER_SIZE)
+        or p.x >= (width - BORDER_SIZE)
+        or p.y >= (height - BORDER_SIZE)
     )
 
 
 func print_grid() -> void:
-    for y: int in range(HEIGHT):
+    for y: int in range(height):
         var row: String = ""
-        for x: int in range(WIDTH):
+        for x: int in range(width):
             var tile: DungeonTile = _tiles[y][x]
             if tile.tile_type == DungeonTile.TileType.WALL:
                 row += "X"
             elif tile.room_id == -1:
                 row += "."
             else:
-                row += "%s" % tile.room_id
+                # Print the room ID modulo 10 to keep it a single digit
+                # IDs may wrap in the display, but their stored values remain correct
+                row += "%s" % (tile.room_id % 10)
         print(row)
 
 
 # Ensures the border is always TileType.WALL
 func _enforce_border() -> void:
-    for y: int in range(HEIGHT):
-        for x: int in range(WIDTH):
+    for y: int in range(height):
+        for x: int in range(width):
             var p: Vector2i = Vector2i(x, y)
             if not is_border(p):
                 continue

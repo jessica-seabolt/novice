@@ -10,6 +10,13 @@ var astar: AStarGrid2D
 var _next_room_id: int
 
 
+func _init(floor_grid: FloorGrid, floor_config: DungeonConfig) -> void:
+    grid = floor_grid
+    config = floor_config
+    rng = RandomNumberGenerator.new()
+    rng.randomize()
+
+
 func make_room(area: Rect2i) -> DungeonRoom:
     var room: DungeonRoom = DungeonRoom.new(_next_room_id, area)
     rooms.append(room)
@@ -17,8 +24,7 @@ func make_room(area: Rect2i) -> DungeonRoom:
     return room
 
 
-func _init(floor_grid: FloorGrid, floor_config: DungeonConfig) -> void:
-    grid = floor_grid
-    config = floor_config
-    rng = RandomNumberGenerator.new()
-    rng.randomize()
+## Clears any rooms placed so far
+func reset_rooms() -> void:
+    rooms.clear()
+    _next_room_id = 0

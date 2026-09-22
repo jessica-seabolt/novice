@@ -32,12 +32,18 @@
 - Avoid type inference
 - Avoid :=
 - Type function returns explicitly, including -> void for functions with no return value
+- Always specify namespace, even within the owning class (`SectorLayout.Orientation`, not `Orientation`)
 
 ## Comments
 
-- Only comment non-obvious implementation details
+- Only comment non-obvious implementation details or doc comments
 - No comment is better than an obvious one
 - Keep comments concise and specific
+- Use ## for documentation meant to surface in tooltips or generated docs
+- Use # for internal implementation notes
+- Trail a comment to the right of the line it describes if it's short
+- Place a comment one line above the code it describes if it's long or multiple lines
+- No period at the end of a comment
 
 ## Organization
 
@@ -84,6 +90,7 @@
 
 - Prefer enums over raw strings/ints for anything with a fixed, known set of states
 - Prefer bitmasks when different states can be true or false simultaneously
+- Always use trailing commas on enums
 
 ## Misc
 
@@ -93,3 +100,4 @@
 - Use match with enums
 - Magic numbers should be named constants
 - Prefer class_name over preloading for game-specific objects
+- Keep lines under 100 characters
