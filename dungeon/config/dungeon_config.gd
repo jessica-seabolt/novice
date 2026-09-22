@@ -20,3 +20,11 @@ class_name DungeonConfig extends Resource
 
 ## Chance that neighbouring rooms merge together
 @export_range(0.0, 1.0, 0.01) var room_combination_chance: float = 0.1
+
+## Min and max number of lakes to try generating on this floor
+@export_range(0, 10) var lake_count_min: int = 0
+@export_range(0, 10) var lake_count_max: int = 0
+
+## Min and max number of rivers to try generating on this floor
+@export_range(0, 10) var river_count_min: int = 0
+@export_range(0, 10) var river_count_max: int = 0

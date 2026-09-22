@@ -5,5 +5,4 @@
 [resource]
 script = ExtResource("1_wunx1")
 room_count_max = 5
-orientation = 6
 metadata/_custom_type_script = "uid://ckcnwl4yosetn"
