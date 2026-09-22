@@ -3,7 +3,7 @@
 A 2D dungeon crawler built in Godot 4 inspired by the Mystery Dungeon franchise, featuring procedurally generated dungeons and a compelling narrative.
 
 ## Overview
-NoVice is a top-down roguelike dungeon crawler. Players will travel through dungeons, gaining new skills and experiencing a fantasy narrative.
+NoVice is a top-down roguelike dungeon crawler. Players will travel through dungeons, gain new skills, and experience a brand-new fantasy story.
 
 ## Technical Details
 **Engine**: Godot 4.x
@@ -17,16 +17,18 @@ NoVice is a top-down roguelike dungeon crawler. Players will travel through dung
 4. Run the ```dungeon/dungeon.tscn``` scene to test.
 
 ## Roadmap
-[ ]Dungeon floor generation
-[ ]Dungeon floor rendering
-[ ]Player Scene and player spawning
-[ ]Stair spawning and floor progression
-[ ]Enemy Scene and enemy spawning
-[ ]Combat
-[ ]Items and item spawning
-[ ]Traps and trap spawning
-[ ]Dungeon layout variance
-[ ]Dialogue
+- [x] Dungeon floor generation
+- [x] Dungeon floor rendering
+- [ ] Dungeon layout variance
+- [ ] Special terrain
+- [ ] Corridor variance
+- [ ] Player Scene and player spawning
+- [ ] Stair spawning and floor progression
+- [ ] Enemy Scene and enemy spawning
+- [ ] Combat
+- [ ] Items and item spawning
+- [ ] Traps and trap spawning
+- [ ] Dialogue
 
 ## License
 All Rights Reserved — © 2026 Jessica Seabolt.

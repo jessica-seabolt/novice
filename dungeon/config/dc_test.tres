@@ -1,0 +1,7 @@
+[gd_resource type="Resource" format=3 uid="uid://cob8tfl3l1gnx"]
+
+[ext_resource type="Script" uid="uid://ckcnwl4yosetn" path="res://dungeon/config/dungeon_config.gd" id="1_wunx1"]
+
+[resource]
+script = ExtResource("1_wunx1")
+metadata/_custom_type_script = "uid://ckcnwl4yosetn"

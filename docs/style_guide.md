@@ -6,10 +6,10 @@
 - snake_case for variables, functions, signals, and file names
 - PascalCase for class names, enums, and nodes
 - CONSTANT_CASE for constants and enum members
-- Private members prefixed with _
+- Private members and functions prefixed with _
 - Signals are named as past-tense events: `room_generated`, `floor_completed`, not `generate_room` or `on_floor_complete`
 - Boolean variables/functions read as yes/no questions: `is_walkable`, `has_trap`, `can_spawn_here`
-- Avoid abbreviations unless they're standard (`pos`, `id` are fine; `rm_cfg` is not)
+- Avoid abbreviations unless they're standard (`pos`, `id`, etc. are fine; `rm_cfg` is not)
 
 ## Privacy
 
@@ -46,30 +46,29 @@
 
 - Inside a file, order top to bottom:
     01. @tool, @icon, @static_unload
-    02. class_name
-    03. extends
-    04. ## doc comment
+    02. class_name / extends
+    03. ## doc comment
 
-    05. signals
-    06. enums
-    07. constants
-    08. static variables
-    09. @export variables
-    10. remaining regular variables
-    11. @onready variables
+    04. signals
+    05. enums
+    06. constants
+    07. static variables
+    08. @export variables
+    09. remaining regular variables
+    10. @onready variables
 
-    12. _static_init()
-    13. remaining static methods
-    14. overridden built-in virtual methods:
+    11. _static_init()
+    12. remaining static methods
+    13. overridden built-in virtual methods:
         1. _init()
         2. _enter_tree()
         3. _ready()
         4. _process()
         5. _physics_process()
         6. remaining virtual methods
-    15. overridden custom methods
-    16. remaining methods
-    17. inner classes
+    14. overridden custom methods
+    15. remaining methods
+    16. inner classes
 
 - Class methods and variables follow this order:
     01. public
@@ -93,3 +92,4 @@
 - Use ternary statements (y if x else z) for simple if/else statements
 - Use match with enums
 - Magic numbers should be named constants
+- Prefer class_name over preloading for game-specific objects
