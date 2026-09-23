@@ -1,5 +1,5 @@
-class_name CorridorCarver extends RefCounted
-## Carves corridors between rooms using A* pathfinding
+class_name HallwayCarver extends RefCounted
+## Carves hallways between rooms using A* pathfinding
 
 const MAX_ATTEMPTS: int = 100
 

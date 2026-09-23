@@ -1,15 +1,16 @@
-class_name RoomConnector extends RefCounted
-## Connects rooms in a dungeon by carving corridors between them
+class_name HallwayGenerator extends RefCounted
+## Connects rooms in a dungeon by carving hallways between them
 
 
-static func connect_rooms(ctx: GenerationContext) -> void:
-    CorridorCarver.build_astar(ctx)
+## Links every room into one chain of hallways, visiting rooms in nearest-neighbour order
+static func generate(ctx: GenerationContext) -> void:
+    HallwayCarver.build_astar(ctx)
 
     var order: Array[int] = _nearest_neighbour_order(ctx.rooms)
     for i: int in range(order.size() - 1):
         var room_a: DungeonRoom = ctx.rooms[order[i]]
         var room_b: DungeonRoom = ctx.rooms[order[i + 1]]
-        CorridorCarver.carve_between(ctx, room_a, room_b)
+        HallwayCarver.carve_between(ctx, room_a, room_b)
 
 
 ## Greedy walk from the leftmost room, linking each room to the nearest unvisited room

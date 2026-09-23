@@ -5,4 +5,8 @@
 [resource]
 script = ExtResource("1_wunx1")
 room_count_max = 5
+lake_count_min = 1
+lake_count_max = 10
+river_count_min = 1
+river_count_max = 30
 metadata/_custom_type_script = "uid://ckcnwl4yosetn"

@@ -132,11 +132,8 @@ static func _get_radius_for_circle(target_rooms: int) -> int:
     return roundi(target_rooms / TAU)
 
 
-# Walks an Archimedean spiral outward from the center, collecting sectors in visiting order.
-# Radius grows with theta rather than being fixed per orientation, so most angle-steps near
-# the center revisit an already-seen sector; those are skipped until the radius grows enough
-# to reach a new one. SWIRL_RADIUS_MULTIPLIER slows that growth so the spiral winds through
-# multiple loops instead of exhausting its budget on the first one
+# Walks an Archimedean spiral outward, collecting new sectors in order
+# The radius grows slowly to create multiple loops
 static func _swirl_offsets(target_rooms: int) -> Array[Vector2i]:
     var offsets: Array[Vector2i] = []
     var seen: Dictionary = {}

@@ -52,4 +52,4 @@ static func _try_combine(
     first.area = merged_area
     first.has_merged = true
     ctx.rooms.erase(neighbour)
-    RoomPlacer.stamp(ctx.grid, first)
+    RoomCarver.carve_room(ctx.grid, first)

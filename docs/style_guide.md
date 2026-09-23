@@ -90,7 +90,6 @@
 
 - Prefer enums over raw strings/ints for anything with a fixed, known set of states
 - Prefer bitmasks when different states can be true or false simultaneously
-- Always use trailing commas on enums
 
 ## Misc
 
@@ -101,3 +100,4 @@
 - Magic numbers should be named constants
 - Prefer class_name over preloading for game-specific objects
 - Keep lines under 100 characters
+- Always use trailing commas on enums, arrays, etc.

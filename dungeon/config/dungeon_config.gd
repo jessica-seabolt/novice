@@ -9,7 +9,7 @@ class_name DungeonConfig extends Resource
 @export_range(1, 30) var room_count_min: int = 1
 @export_range(1, 30) var room_count_max: int = 10
 
-## How this dungeon's sectors should be laid out; see SectorLayout for details
+## How this dungeon's sectors should be laid out (see SectorLayout)
 @export var orientation: SectorLayout.Orientation = SectorLayout.Orientation.STANDARD
 
 ## Min and max room width/height in tiles

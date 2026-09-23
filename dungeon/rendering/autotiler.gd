@@ -1,6 +1,6 @@
 class_name Autotiler extends RefCounted
 ## Picks tile variants from the TileSet's native terrain peering bits
-## A set bit means that side must bethat terrain
+## A set bit means that side must be that terrain
 ## An empty side means anything but the tile's own terrain
 ## Each distinct neighbourhood is scored once and cached
 

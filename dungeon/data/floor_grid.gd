@@ -36,6 +36,10 @@ func is_wall(p: Vector2i) -> bool:
     return _tiles[p.y][p.x].tile_type == DungeonTile.TileType.WALL
 
 
+func is_special_terrain(p: Vector2i) -> bool:
+    return _tiles[p.y][p.x].tile_type == DungeonTile.TileType.SPECIAL_TERRAIN
+
+
 func is_room(p: Vector2i) -> bool:
     return _tiles[p.y][p.x].room_id != -1
 
@@ -66,9 +70,9 @@ func build(new_width: int, new_height: int) -> void:
     height = new_height
     _tiles.clear()
 
-    for y: int in range(height):
+    for _y: int in range(height):
         var row: Array = []
-        for x: int in range(width):
+        for _x: int in range(width):
             row.append(DungeonTile.new())
         _tiles.append(row)
 
@@ -91,6 +95,8 @@ func print_grid() -> void:
             var tile: DungeonTile = _tiles[y][x]
             if tile.tile_type == DungeonTile.TileType.WALL:
                 row += "X"
+            elif tile.tile_type == DungeonTile.TileType.SPECIAL_TERRAIN:
+                row += "~"
             elif tile.room_id == -1:
                 row += "."
             else:
