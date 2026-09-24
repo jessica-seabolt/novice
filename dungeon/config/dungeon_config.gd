@@ -21,6 +21,16 @@ class_name DungeonConfig extends Resource
 ## Chance that neighbouring rooms merge together
 @export_range(0.0, 1.0, 0.01) var room_combination_chance: float = 0.1
 
+## Style of hallways to generate
+@export var hallway_style: HallwayGenerator.Style = HallwayGenerator.Style.DIRECT
+
+## Number of extra hallways to generate beyond the main network
+@export_range(0, 30) var extra_hallway_count_min: int = 0
+@export_range(0, 30) var extra_hallway_count_max: int = 0
+
+## Chance an extra hallway leads to a dead end
+@export_range(0.0, 1.0, 0.01) var dead_end_chance: float = 0.0
+
 ## Min and max number of lakes to try generating on this floor
 @export_range(0, 10) var lake_count_min: int = 0
 @export_range(0, 10) var lake_count_max: int = 0

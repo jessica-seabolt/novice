@@ -24,13 +24,6 @@ const RIVER_WEIGHT_AWAY_FROM_WALL: float = 0.5
 const RIVER_WEIGHT_TOWARD_CENTER: float = 0.35
 const RIVER_WEIGHT_AWAY_FROM_CENTER: float = 0.25
 
-const CARDINALS: Array[Vector2i] = [
-    Vector2i(0, -1), # Up
-    Vector2i(1, 0), # Right
-    Vector2i(0, 1), # Down
-    Vector2i(-1, 0), # Left
-]
-
 
 ## Grows a lake outward from start, painting only wall tiles
 ## Spread chance shrinks with distance, so edges come out ragged rather than diamond-shaped
@@ -52,7 +45,7 @@ static func carve_lake(grid: FloorGrid, start: Vector2i, rng: RandomNumberGenera
         if d >= radius:
             continue
 
-        for direction: Vector2i in CARDINALS:
+        for direction: Vector2i in FloorGrid.CARDINALS:
             var neighbour: Vector2i = p + direction
             if grid.is_border(neighbour) or visited.has(neighbour):
                 continue

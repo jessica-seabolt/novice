@@ -40,12 +40,7 @@ static func _generate_fallback_room(ctx: GenerationContext) -> void:
     ctx.grid.reset()
     ctx.reset_rooms()
 
-    var border: int = FloorGrid.BORDER_SIZE
-    var rect: Rect2i = Rect2i(
-        border, border, ctx.grid.width - border * 2, ctx.grid.height - border * 2
-    )
-
-    RoomCarver.carve_room(ctx.grid, ctx.make_room(rect))
+    RoomCarver.carve_room(ctx.grid, ctx.make_room(ctx.grid.get_interior()))
 
 
 static func _respects_gap(rooms: Array[DungeonRoom], rect: Rect2i) -> bool:

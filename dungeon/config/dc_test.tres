@@ -5,8 +5,9 @@
 [resource]
 script = ExtResource("1_wunx1")
 room_count_max = 5
-lake_count_min = 1
-lake_count_max = 10
+extra_hallway_count_min = 1
+extra_hallway_count_max = 10
+dead_end_chance = 0.5
 river_count_min = 1
-river_count_max = 30
+river_count_max = 10
 metadata/_custom_type_script = "uid://ckcnwl4yosetn"

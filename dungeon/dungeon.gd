@@ -22,5 +22,6 @@ func generate_floor() -> void:
     RoomGenerator.generate(ctx)
     HallwayGenerator.generate(ctx)
     SpecialTerrainGenerator.generate(ctx)
+    FloorValidator.validate(ctx)
     FloorRenderer.render(grid, tilemap_layer)
     grid.print_grid()

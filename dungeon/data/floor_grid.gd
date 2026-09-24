@@ -6,6 +6,14 @@ const BORDER_SIZE: int = 2
 const MAX_WIDTH: int = 84
 const MAX_HEIGHT: int = 52
 
+## The four directions to a tile's walkable neighbours
+const CARDINALS: Array[Vector2i] = [
+    Vector2i(0, -1), # Up
+    Vector2i(1, 0), # Right
+    Vector2i(0, 1), # Down
+    Vector2i(-1, 0), # Left
+]
+
 var width: int = 0
 var height: int = 0
 
@@ -86,6 +94,11 @@ func is_border(p: Vector2i) -> bool:
         or p.x >= (width - BORDER_SIZE)
         or p.y >= (height - BORDER_SIZE)
     )
+
+
+## Everything inside the border, where rooms and hallways can go
+func get_interior() -> Rect2i:
+    return Rect2i(BORDER_SIZE, BORDER_SIZE, width - BORDER_SIZE * 2, height - BORDER_SIZE * 2)
 
 
 func print_grid() -> void:
