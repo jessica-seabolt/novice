@@ -8,8 +8,9 @@ static func validate(ctx: GenerationContext) -> void:
     for _repair: int in range(ctx.rooms.size()):
         var labels: Dictionary = _label_regions(ctx.grid)
         var region_rooms: Dictionary = _rooms_by_region(ctx.grid, labels)
-        var main: int = _region_with_most_rooms(region_rooms)
+        var main: int = _main_region(region_rooms, _region_sizes(labels))
         if main == -1 or region_rooms[main].size() == ctx.rooms.size():
+            ctx.reachable_tiles = _tiles_in_region(labels, main)
             return
 
         var path: Array[Vector2i] = _path_to_missing_room(ctx.grid, labels, region_rooms, main)
@@ -69,10 +70,17 @@ static func _rooms_by_region(grid: FloorGrid, labels: Dictionary) -> Dictionary:
     return region_rooms
 
 
-static func _region_with_most_rooms(region_rooms: Dictionary) -> int:
+# The region touching the most rooms, or the bigger one when two regions touch as many
+static func _main_region(region_rooms: Dictionary, region_sizes: Dictionary) -> int:
     var best: int = -1
     for region: int in region_rooms:
-        if best == -1 or region_rooms[region].size() > region_rooms[best].size():
+        if best == -1:
+            best = region
+            continue
+        var rooms_here: int = region_rooms[region].size()
+        var rooms_best: int = region_rooms[best].size()
+        var bigger: bool = region_sizes[region] > region_sizes[best]
+        if rooms_here > rooms_best or (rooms_here == rooms_best and bigger):
             best = region
     return best
 
@@ -124,3 +132,18 @@ static func _trace_back(came_from: Dictionary, from: Vector2i) -> Array[Vector2i
         path.append(p)
         p = came_from[p]
     return path
+
+
+static func _tiles_in_region(labels: Dictionary, region: int) -> Array[Vector2i]:
+    var tiles: Array[Vector2i] = []
+    for p: Vector2i in labels:
+        if labels[p] == region:
+            tiles.append(p)
+    return tiles
+
+
+static func _region_sizes(labels: Dictionary) -> Dictionary:
+    var sizes: Dictionary = {}
+    for p: Vector2i in labels:
+        sizes[labels[p]] = sizes.get(labels[p], 0) + 1
+    return sizes

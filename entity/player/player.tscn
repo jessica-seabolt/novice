@@ -1,0 +1,24 @@
+[gd_scene format=3 uid="uid://jn4w2opxosxp"]
+
+[ext_resource type="Script" uid="uid://dy3jluem0hnvd" path="res://entity/player/player.gd" id="1_e6ar1"]
+[ext_resource type="Texture2D" uid="uid://2jb32pypqpnd" path="res://graphics/sprites/test_sprite.png" id="2_4pl66"]
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_86mg2"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("2_4pl66")
+}],
+"loop": 1,
+"name": &"default",
+"speed": 5.0
+}]
+
+[node name="Player" type="Node2D" unique_id=1132814981]
+script = ExtResource("1_e6ar1")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=1269501177]
+sprite_frames = SubResource("SpriteFrames_86mg2")
+
+[node name="Camera2D" type="Camera2D" parent="." unique_id=1952857559]
+zoom = Vector2(3, 3)
