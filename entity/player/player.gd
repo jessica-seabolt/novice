@@ -1,9 +1,9 @@
 class_name Player extends Node2D
-## The player's character, walking the floor one tile per turn
+## The player's character
 
 ## How long one step takes to slide, in seconds
 const STEP_DURATION: float = 0.15
-## How long a freshly pressed direction waits for a second key, so two keys make a diagonal
+## How long the buffer is to wait for diagonal input
 const DIAGONAL_GRACE: float = 0.05
 
 var grid_position: Vector2i
@@ -32,17 +32,16 @@ func take_turn() -> void:
         if MoveRules.can_step(_grid, grid_position, direction):
             _step(direction)
             return
-        # Blocked moves cost nothing, but wait a frame so that holding
+        # Blocked moves cost nothing, but wait a frame so holding
         # a direction into a wall doesn't freeze the game
         await get_tree().process_frame
 
 
 # Returns the held direction, waiting for one if nothing is held
-# A fresh press waits a moment longer, in case a second key is on its way to make a diagonal
 func _wait_for_direction() -> Vector2i:
     var direction: Vector2i = _held_direction()
     if direction != Vector2i.ZERO:
-        return direction # Still held from the last step, so keep walking without delay
+        return direction # Still held from the last step, keep walking
 
     while direction == Vector2i.ZERO:
         await get_tree().process_frame
@@ -57,7 +56,7 @@ func _wait_for_direction() -> Vector2i:
     return direction
 
 
-# Moves on the grid right away, then slides the sprite over to match
+# Moves on the grid, then slides the sprite over to match
 func _step(direction: Vector2i) -> void:
     grid_position += direction
     var target: Vector2 = _tilemap_layer.map_to_local(grid_position)

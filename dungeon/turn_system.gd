@@ -8,7 +8,7 @@ func add_actor(actor: Player) -> void:
     _actors.append(actor)
 
 
-## Runs turns forever, one actor at a time
+## Runs forever, waiting for turns
 func run() -> void:
     if _actors.is_empty():
         return
