@@ -8,16 +8,40 @@ var config: DungeonConfig
 var grid: FloorGrid
 var player: Player
 var turn_system: TurnSystem
+var floor_number: int = 1
 
-@onready var tilemap_layer: TileMapLayer = $TileMapLayer
+@onready var floor_layer: TileMapLayer = $FloorLayer
+@onready var feature_layer: TileMapLayer = $FeatureLayer
 
 
 func _ready() -> void:
     config = TEST_CONFIG
-    generate_floor()
+    _spawn_player()
+    _setup_turn_system()
+    _start_floor()
 
 
-func generate_floor() -> void:
+# Builds a fresh floor, puts the player on it, and starts taking turns
+func _start_floor() -> void:
+    var ctx: GenerationContext = _generate_floor()
+    player.setup(grid, floor_layer, ctx.player_spawn)
+    print("Floor ", floor_number)
+    turn_system.run()
+
+
+func _on_actor_acted(actor: Player) -> void:
+    if actor != player:
+        return
+    if grid.get_tile(player.grid_position).feature != DungeonTile.Feature.STAIRS:
+        return
+    if floor_number >= config.floor_count:
+        return # The last floor's stairs lead nowhere yet
+    turn_system.stop()
+    floor_number += 1
+    _start_floor.call_deferred()
+
+
+func _generate_floor() -> GenerationContext:
     grid = FloorGrid.new()
     var floor_width: int = floori(float(FloorGrid.MAX_WIDTH) * config.grid_usage)
     var floor_height: int = floori(float(FloorGrid.MAX_HEIGHT) * config.grid_usage)
@@ -29,19 +53,19 @@ func generate_floor() -> void:
     SpecialTerrainGenerator.generate(ctx)
     FloorValidator.validate(ctx)
     SpawnGenerator.generate(ctx)
-    FloorRenderer.render(grid, tilemap_layer)
-    _spawn_player(ctx)
-    _setup_turn_system()
+    FloorRenderer.render(grid, floor_layer)
+    FeatureRenderer.render(grid, feature_layer, config.stair_direction)
     grid.print_grid()
 
+    return ctx
 
-func _spawn_player(ctx: GenerationContext) -> void:
+
+func _spawn_player() -> void:
     player = PLAYER_SCENE.instantiate()
     add_child(player)
-    player.setup(grid, tilemap_layer, ctx.player_spawn)
 
 
 func _setup_turn_system() -> void:
     turn_system = TurnSystem.new()
     turn_system.add_actor(player)
-    turn_system.run()
+    turn_system.actor_acted.connect(_on_actor_acted)

@@ -110,6 +110,8 @@ func print_grid() -> void:
                 row += "X"
             elif tile.tile_type == DungeonTile.TileType.SPECIAL_TERRAIN:
                 row += "~"
+            elif tile.feature == DungeonTile.Feature.STAIRS:
+                row += "S"
             elif tile.room_id == -1:
                 row += "."
             else:
@@ -130,4 +132,4 @@ func _enforce_border() -> void:
             var tile: DungeonTile = _tiles[y][x]
             tile.tile_type = DungeonTile.TileType.WALL
             tile.room_id = -1
-            tile.is_stairs = false
+            tile.feature = DungeonTile.Feature.NONE

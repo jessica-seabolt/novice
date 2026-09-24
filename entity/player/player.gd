@@ -15,6 +15,9 @@ var _step_tween: Tween
 
 ## Places the player on the floor it will be walking around
 func setup(floor_grid: FloorGrid, tilemap_layer: TileMapLayer, spawn: Vector2i) -> void:
+    if _step_tween != null:
+        _step_tween.kill()
+
     _grid = floor_grid
     _tilemap_layer = tilemap_layer
     grid_position = spawn

@@ -23,7 +23,8 @@ NoVice is a top-down roguelike dungeon crawler. Players will travel through dung
 - [x] Special terrain
 - [x] Hallway variance
 - [x] Player Scene and player spawning
-- [ ] Stair spawning and floor progression
+- [x] Stair spawning and floor progression
+- [ ] Sprinting
 - [ ] Enemy Scene and enemy spawning
 - [ ] Combat
 - [ ] Items and item spawning
