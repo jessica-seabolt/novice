@@ -57,6 +57,16 @@ func is_hallway(p: Vector2i) -> bool:
     return is_ground(p) and not is_room(p)
 
 
+## A room tile with a hallway right beside it
+func is_doorway(p: Vector2i) -> bool:
+    if not is_room(p):
+        return false
+    for side: Vector2i in CARDINALS:
+        if is_hallway(p + side):
+            return true
+    return false
+
+
 func count_ground_tiles() -> int:
     var count: int = 0
     for y: int in range(height):
