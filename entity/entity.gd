@@ -4,6 +4,7 @@ class_name Entity extends Node2D
 signal placed
 
 var grid_position: Vector2i
+var facing: Vector2i = Vector2i.DOWN
 var floor_state: FloorState
 
 var _tilemap_layer: TileMapLayer
@@ -40,6 +41,7 @@ func step(direction: Vector2i, duration: float) -> void:
     var to: Vector2i = grid_position + direction
     floor_state.occupancy.move(self, grid_position, to)
     grid_position = to
+    facing = direction
 
     # Finish an almost-done slide rather than cutting its last frame
     if _step_tween != null and _step_tween.is_running():
@@ -49,6 +51,16 @@ func step(direction: Vector2i, duration: float) -> void:
     _slide_target = _tilemap_layer.map_to_local(grid_position)
     _step_tween = create_tween()
     _step_tween.tween_property(self, "position", _slide_target, duration)
+
+
+func face(direction: Vector2i) -> void:
+    facing = direction
+
+
+## A tile's area in the same space as the entity's position
+func tile_rect(p: Vector2i) -> Rect2:
+    var size: Vector2 = Vector2(_tilemap_layer.tile_set.tile_size)
+    return Rect2(_tilemap_layer.map_to_local(p) - size / 2.0, size)
 
 
 ## Waits for the current slide to end

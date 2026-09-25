@@ -1,5 +1,5 @@
 class_name PlayerControl extends Node
-## Moves its entity from player input, including running
+## Moves its entity from player input
 
 ## Seconds per walking step
 const STEP_DURATION: float = 0.15
@@ -13,6 +13,10 @@ const MOVE_ACTIONS: Array[StringName] = [&"move_up", &"move_down", &"move_left",
 var _run_direction: Vector2i = Vector2i.ZERO
 # Stops a key held from a run from walking on
 var _needs_fresh_press: bool = false
+# Set by a step that lands next to an entity
+var _stepped_into_contact: bool = false
+# Set when the stick returns to centre during a run
+var _stick_centred: bool = false
 
 @onready var _entity: Entity = get_parent() as Entity
 
@@ -25,7 +29,12 @@ func _ready() -> void:
 
 func _unhandled_input(event: InputEvent) -> void:
     # A fresh direction press cancels a run
-    if _run_direction == Vector2i.ZERO or not _is_direction_press(event):
+    if _run_direction == Vector2i.ZERO:
+        return
+    if event is InputEventJoypadMotion:
+        if not _stick_cancels_run():
+            return
+    elif not _is_direction_press(event):
         return
     _stop_run()
     get_viewport().set_input_as_handled()
@@ -36,17 +45,27 @@ func _take_turn() -> void:
 
     var state: FloorState = _entity.floor_state
     if _run_direction != Vector2i.ZERO:
-        if RunRules.should_continue(state, _entity.grid_position, _run_direction):
+        var keep_running: bool = (
+            not _stepped_into_contact
+            and RunRules.should_continue(state, _entity.grid_position, _run_direction)
+        )
+        if keep_running:
             _step(_run_direction, RUN_STEP_DURATION)
             return
         _stop_run()
 
     while true:
         var direction: Vector2i = await _wait_for_direction()
+        # Turning in place is free
+        if Input.is_action_pressed(&"aim"):
+            _entity.face(direction)
+            await get_tree().process_frame
+            continue
         if MoveRules.can_step(state, _entity.grid_position, direction):
             # Sprint held starts a run
             if Input.is_action_pressed(&"sprint"):
                 _run_direction = direction
+                _stick_centred = false
                 _step(direction, RUN_STEP_DURATION)
             else:
                 _step(direction, STEP_DURATION)
@@ -56,9 +75,13 @@ func _take_turn() -> void:
 
 
 func _wait_for_direction() -> Vector2i:
-    # Everything must be let go after a run
+    # After a run, the direction must be let go, unless letting go of sprint walks on instead
     if _needs_fresh_press:
-        while _held_direction() != Vector2i.ZERO:
+        var sprint_held: bool = Input.is_action_pressed(&"sprint")
+        while _held_direction() != Vector2i.ZERO and not Input.is_action_pressed(&"aim"):
+            if sprint_held and not Input.is_action_pressed(&"sprint"):
+                break
+            sprint_held = Input.is_action_pressed(&"sprint")
             await get_tree().process_frame
         _needs_fresh_press = false
 
@@ -81,7 +104,10 @@ func _wait_for_direction() -> Vector2i:
 
 # Everything else slides at the player's pace
 func _step(direction: Vector2i, duration: float) -> void:
-    _entity.floor_state.step_duration = duration
+    var state: FloorState = _entity.floor_state
+    # Entities walking up to the player don't count
+    _stepped_into_contact = RunRules.steps_into_contact(state, _entity.grid_position, direction)
+    state.step_duration = duration
     _entity.step(direction, duration)
 
 
@@ -93,6 +119,16 @@ func _stop_run() -> void:
 func _held_direction() -> Vector2i:
     var input: Vector2 = Input.get_vector("move_left", "move_right", "move_up", "move_down")
     return Vector2i(signi(roundi(input.x)), signi(roundi(input.y)))
+
+
+# Only cancels by turning 90 degrees or more from the run
+# or by being let go and pushed again
+func _stick_cancels_run() -> bool:
+    var held: Vector2i = _held_direction()
+    if held == Vector2i.ZERO:
+        _stick_centred = true
+        return false
+    return _stick_centred or held.x * _run_direction.x + held.y * _run_direction.y <= 0
 
 
 func _is_direction_press(event: InputEvent) -> bool:

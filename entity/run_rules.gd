@@ -9,8 +9,6 @@ static func should_continue(state: FloorState, at: Vector2i, direction: Vector2i
     # Always, so stairs can't be run past
     if _near_stairs(grid, at):
         return false
-    if _next_to_entity(state, at):
-        return false
 
     if grid.is_room(at):
         # Arriving through a doorway or passing one
@@ -36,11 +34,16 @@ static func _side_passage(grid: FloorGrid, at: Vector2i, direction: Vector2i) ->
     return false
 
 
-# Temporary until line of sight
-static func _next_to_entity(state: FloorState, at: Vector2i) -> bool:
+## Whether stepping from "from" puts the runner next to an entity it wasn't already next to
+## Temporary until line of sight
+static func steps_into_contact(state: FloorState, from: Vector2i, direction: Vector2i) -> bool:
+    var to: Vector2i = from + direction
     for y: int in range(-1, 2):
         for x: int in range(-1, 2):
-            if (x != 0 or y != 0) and state.occupancy.is_occupied(at + Vector2i(x, y)):
+            var p: Vector2i = to + Vector2i(x, y)
+            if p == to or p == from or not state.occupancy.is_occupied(p):
+                continue
+            if absi(p.x - from.x) > 1 or absi(p.y - from.y) > 1:
                 return true
     return false
 
