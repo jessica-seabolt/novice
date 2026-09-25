@@ -8,11 +8,14 @@ static func can_step(state: FloorState, from: Vector2i, direction: Vector2i) -> 
     if not grid.is_ground(to) or state.occupancy.is_occupied(to):
         return false
 
-    # A diagonal step can't cut across the corner of a wall
-    if direction.x != 0 and direction.y != 0:
-        var beside_x: Vector2i = from + Vector2i(direction.x, 0)
-        var beside_y: Vector2i = from + Vector2i(0, direction.y)
-        if grid.is_wall(beside_x) or grid.is_wall(beside_y):
-            return false
+    return not cuts_corner(grid, from, direction)
 
-    return true
+
+## Whether a diagonal from "from" crosses the corner of a wall
+static func cuts_corner(grid: FloorGrid, from: Vector2i, direction: Vector2i) -> bool:
+    if direction.x == 0 or direction.y == 0:
+        return false
+    return (
+        grid.is_wall(from + Vector2i(direction.x, 0))
+        or grid.is_wall(from + Vector2i(0, direction.y))
+    )

@@ -17,6 +17,7 @@ var _needs_fresh_press: bool = false
 var _stepped_into_contact: bool = false
 # Set when the stick returns to centre during a run
 var _stick_centred: bool = false
+var _spell_requested: bool = false
 
 @onready var _entity: Entity = get_parent() as Entity
 
@@ -28,6 +29,10 @@ func _ready() -> void:
 
 
 func _unhandled_input(event: InputEvent) -> void:
+    if event.is_action_pressed(&"basic_spell"):
+        _spell_requested = true
+        get_viewport().set_input_as_handled()
+        return
     # A fresh direction press cancels a run
     if _run_direction == Vector2i.ZERO:
         return
@@ -44,6 +49,9 @@ func _take_turn() -> void:
     await _entity.finish_slide()
 
     var state: FloorState = _entity.floor_state
+    if _spell_requested:
+        _cast_basic_spell()
+        return
     if _run_direction != Vector2i.ZERO:
         var keep_running: bool = (
             not _stepped_into_contact
@@ -56,6 +64,9 @@ func _take_turn() -> void:
 
     while true:
         var direction: Vector2i = await _wait_for_direction()
+        if _spell_requested:
+            _cast_basic_spell()
+            return
         # Turning in place is free
         if Input.is_action_pressed(&"aim"):
             _entity.face(direction)
@@ -82,6 +93,8 @@ func _wait_for_direction() -> Vector2i:
             if sprint_held and not Input.is_action_pressed(&"sprint"):
                 break
             sprint_held = Input.is_action_pressed(&"sprint")
+            if _spell_requested:
+                return Vector2i.ZERO
             await get_tree().process_frame
         _needs_fresh_press = false
 
@@ -90,6 +103,8 @@ func _wait_for_direction() -> Vector2i:
         return direction # Held from the last step
 
     while direction == Vector2i.ZERO:
+        if _spell_requested:
+            return Vector2i.ZERO
         await get_tree().process_frame
         direction = _held_direction()
 
@@ -109,6 +124,14 @@ func _step(direction: Vector2i, duration: float) -> void:
     _stepped_into_contact = RunRules.steps_into_contact(state, _entity.grid_position, direction)
     state.step_duration = duration
     _entity.step(direction, duration)
+
+
+func _cast_basic_spell() -> void:
+    _spell_requested = false
+    if _run_direction != Vector2i.ZERO:
+        _stop_run()
+    _entity.floor_state.step_duration = STEP_DURATION
+    BasicSpell.cast(_entity)
 
 
 func _stop_run() -> void:
