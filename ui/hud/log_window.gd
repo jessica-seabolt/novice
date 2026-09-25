@@ -1,5 +1,5 @@
 class_name LogWindow extends Control
-## Every message this run, scrollable, pausing the game while open
+## Every message this run, scrollable
 
 signal opened
 signal closed
@@ -49,6 +49,9 @@ func _process(delta: float) -> void:
 func _unhandled_input(event: InputEvent) -> void:
     if not event.is_action_pressed(&"toggle_log"):
         return
+    # Only opens during play, so another window can use the same button
+    if not visible and get_tree().paused:
+        return
     get_viewport().set_input_as_handled()
     if visible:
         close()
@@ -58,14 +61,12 @@ func _unhandled_input(event: InputEvent) -> void:
 
 func open() -> void:
     show()
-    get_tree().paused = true
     opened.emit()
     _scroll_to_end.call_deferred()
 
 
 func close() -> void:
     hide()
-    get_tree().paused = false
     closed.emit()
 
 

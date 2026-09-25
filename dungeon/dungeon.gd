@@ -13,6 +13,8 @@ var turn_system: TurnSystem
 var floor_number: int = 1
 var mobs: Array[Entity] = []
 var hud: Hud
+# To tell arriving on stairs from standing on them
+var _player_last_position: Vector2i
 
 @onready var floor_layer: TileMapLayer = $FloorLayer
 @onready var feature_layer: TileMapLayer = $FeatureLayer
@@ -23,6 +25,7 @@ func _ready() -> void:
     hud = HUD_SCENE.instantiate()
     add_child(hud)
     add_child(DamageNumbers.new())
+    add_child(CombatSounds.new())
     _spawn_player()
     hud.setup(Stats.of(player))
     _setup_turn_system()
@@ -35,17 +38,25 @@ func _start_floor() -> void:
     floor_state = FloorState.new(ctx.grid, ctx.rooms, ctx.reachable_tiles, ctx.rng)
     floor_state.player = player
     player.setup(floor_state, floor_layer, ctx.player_spawn)
+    _player_last_position = ctx.player_spawn
     _spawn_mobs(ctx)
     turn_system.run()
 
 
-func _on_actor_acted(actor: Entity) -> void:
+func _between_turns(actor: Entity) -> void:
     if actor != player:
+        return
+    var arrived: bool = player.grid_position != _player_last_position
+    _player_last_position = player.grid_position
+    if not arrived:
         return
     if floor_state.grid.get_tile(player.grid_position).feature != DungeonTile.Feature.STAIRS:
         return
     if floor_number >= config.floor_count:
         return # The last floor's stairs lead nowhere yet
+    await player.finish_slide()
+    if await hud.ask("Proceed to the next floor?", ["Yes", "No"]) != 0:
+        return
     turn_system.stop()
     floor_number += 1
     _start_floor.call_deferred()
@@ -135,4 +146,4 @@ func _vanish(entity: Entity) -> void:
 func _setup_turn_system() -> void:
     turn_system = TurnSystem.new()
     turn_system.add_actor(player)
-    turn_system.actor_acted.connect(_on_actor_acted)
+    turn_system.between_turns = _between_turns

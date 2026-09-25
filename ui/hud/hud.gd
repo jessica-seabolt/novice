@@ -1,11 +1,12 @@
 class_name Hud extends CanvasLayer
-## The player's bars, the latest message, and the full message log
+## The player's bars, messages, and windows; the game pauses while any window is open
 
 ## Seconds the latest message stays on screen
 const MESSAGE_DURATION: float = 3.0
 
 var _stats: Stats
 var _lines: Array[String] = []
+var _open_windows: int = 0
 
 @onready var _health: StatBar = $Bars/Health
 @onready var _mana: StatBar = $Bars/Mana
@@ -13,13 +14,16 @@ var _lines: Array[String] = []
 @onready var _popup_text: Label = $Popup/Text
 @onready var _popup_timer: Timer = $Popup/Timer
 @onready var _log_window: LogWindow = $LogWindow
+@onready var _prompt: Prompt = $Prompt
 
 
 func _ready() -> void:
     SignalBus.entity_damaged.connect(_on_entity_damaged)
     SignalBus.entity_defeated.connect(_on_entity_defeated)
     _popup_timer.timeout.connect(_popup.hide)
-    _log_window.opened.connect(_hide_popup)
+    for window: Node in [_log_window, $Prompt/Menu, $MainMenu/Menu]:
+        window.opened.connect(_on_window_opened)
+        window.closed.connect(_on_window_closed)
 
 
 func setup(stats: Stats) -> void:
@@ -42,15 +46,27 @@ func show_log() -> void:
     await _log_window.closed
 
 
+## The chosen option's index, or -1 if cancelled
+func ask(question: String, options: Array[String]) -> int:
+    return await _prompt.ask(question, options)
+
+
 ## The latest message stays on screen
 func clear_log() -> void:
     _lines.clear()
     _log_window.set_lines(_lines)
 
 
-func _hide_popup() -> void:
+func _on_window_opened() -> void:
+    _open_windows += 1
+    get_tree().paused = true
     _popup.hide()
     _popup_timer.stop()
+
+
+func _on_window_closed() -> void:
+    _open_windows -= 1
+    get_tree().paused = _open_windows > 0
 
 
 func _refresh() -> void:

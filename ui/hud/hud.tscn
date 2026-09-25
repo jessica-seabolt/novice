@@ -6,11 +6,13 @@
 [ext_resource type="Texture2D" uid="uid://3uh4v0yatp8m" path="res://graphics/ui/empty_health_bar.png" id="4_health_empty"]
 [ext_resource type="Texture2D" uid="uid://1kam2hluku4o" path="res://graphics/ui/mana_bar.png" id="5_mana"]
 [ext_resource type="Texture2D" uid="uid://jfqbqr4jycja" path="res://graphics/ui/empty_mana_bar.png" id="6_mana_empty"]
-[ext_resource type="Texture2D" uid="uid://dcgdhdxqv7kh4" path="res://graphics/ui/dialogue_box.png" id="7_box"]
-[ext_resource type="Texture2D" uid="uid://dbptn2cpxjqvv" path="res://graphics/ui/dialogue_window.png" id="8_window"]
+[ext_resource type="PackedScene" path="res://ui/window_frame.tscn" id="7_frame"]
 [ext_resource type="Script" path="res://ui/hud/log_window.gd" id="9_log"]
 [ext_resource type="Texture2D" uid="uid://j3bx7tgtk11o" path="res://graphics/ui/scroll_tab.png" id="10_tab"]
 [ext_resource type="Script" path="res://ui/scroll_tab.gd" id="11_scroll_tab"]
+[ext_resource type="Script" path="res://ui/hud/prompt.gd" id="12_prompt"]
+[ext_resource type="PackedScene" path="res://ui/menu/selection_menu.tscn" id="13_menu"]
+[ext_resource type="Script" path="res://ui/hud/main_menu.gd" id="14_main_menu"]
 
 [node name="Hud" type="CanvasLayer"]
 script = ExtResource("1_hud")
@@ -47,32 +49,10 @@ offset_right = -4.0
 offset_bottom = -4.0
 grow_horizontal = 2
 grow_vertical = 0
+mouse_filter = 2
 
-[node name="Box" type="NinePatchRect" parent="Popup"]
+[node name="Frame" parent="Popup" instance=ExtResource("7_frame")]
 layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_left = 3.0
-offset_top = 3.0
-offset_right = -3.0
-offset_bottom = -3.0
-grow_horizontal = 2
-grow_vertical = 2
-texture = ExtResource("7_box")
-
-[node name="Frame" type="NinePatchRect" parent="Popup"]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-texture = ExtResource("8_window")
-patch_margin_left = 5
-patch_margin_top = 5
-patch_margin_right = 5
-patch_margin_bottom = 5
 
 [node name="Text" type="Label" parent="Popup"]
 layout_mode = 1
@@ -101,31 +81,8 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("9_log")
 
-[node name="Box" type="NinePatchRect" parent="LogWindow"]
+[node name="Frame" parent="LogWindow" instance=ExtResource("7_frame")]
 layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_left = 3.0
-offset_top = 3.0
-offset_right = -3.0
-offset_bottom = -3.0
-grow_horizontal = 2
-grow_vertical = 2
-texture = ExtResource("7_box")
-
-[node name="Frame" type="NinePatchRect" parent="LogWindow"]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-texture = ExtResource("8_window")
-patch_margin_left = 5
-patch_margin_top = 5
-patch_margin_right = 5
-patch_margin_bottom = 5
 
 [node name="Scroll" type="ScrollContainer" parent="LogWindow"]
 layout_mode = 1
@@ -150,3 +107,50 @@ layout_mode = 0
 texture = ExtResource("10_tab")
 script = ExtResource("11_scroll_tab")
 scroll = NodePath("../Scroll")
+
+[node name="Prompt" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("12_prompt")
+
+[node name="Question" type="Control" parent="Prompt"]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 4.0
+offset_top = -28.0
+offset_right = -4.0
+offset_bottom = -4.0
+grow_horizontal = 2
+grow_vertical = 0
+mouse_filter = 2
+
+[node name="Frame" parent="Prompt/Question" instance=ExtResource("7_frame")]
+layout_mode = 1
+
+[node name="Text" type="Label" parent="Prompt/Question"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 8.0
+offset_right = -8.0
+grow_horizontal = 2
+grow_vertical = 2
+vertical_alignment = 1
+
+[node name="Menu" parent="Prompt" instance=ExtResource("13_menu")]
+layout_mode = 0
+
+[node name="MainMenu" type="Node" parent="." node_paths=PackedStringArray("log_window")]
+script = ExtResource("14_main_menu")
+log_window = NodePath("../LogWindow")
+
+[node name="Menu" parent="MainMenu" instance=ExtResource("13_menu")]
