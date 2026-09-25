@@ -1,5 +1,5 @@
 class_name Dungeon extends Node2D
-## Generates dungeon floors for a player to explore
+## Builds each floor and runs its turns
 
 const TEST_CONFIG = preload("res://dungeon/config/dc_test.tres")
 const PLAYER_SCENE: PackedScene = preload("res://entity/player/player.tscn")
@@ -23,7 +23,6 @@ func _ready() -> void:
     _start_floor()
 
 
-# Builds a fresh floor, puts the player on it, and starts taking turns
 func _start_floor() -> void:
     var ctx: GenerationContext = _generate_floor()
     floor_state = FloorState.new(ctx.grid, ctx.rooms, ctx.reachable_tiles, ctx.rng)

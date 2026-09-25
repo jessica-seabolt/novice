@@ -1,8 +1,7 @@
 class_name RoomCombiner extends RefCounted
-## Merges rooms with their closest neighbour, based on the config's combination chance
+## Merges some rooms with their closest neighbour
 
 
-## Rolls each room's chance to swallow its closest neighbour into one bigger room
 static func combine_rooms(ctx: GenerationContext) -> void:
     for room: DungeonRoom in ctx.rooms.duplicate():
         if not ctx.rooms.has(room) or room.has_merged:
@@ -15,7 +14,7 @@ static func combine_rooms(ctx: GenerationContext) -> void:
             _try_combine(ctx, room, neighbour)
 
 
-# The nearest other unmerged room to "from", or null if there isn't one
+# Null if there's no other unmerged room
 static func _closest_room(rooms: Array[DungeonRoom], from: DungeonRoom) -> DungeonRoom:
     var closest: DungeonRoom = null
     var closest_distance: int = -1
@@ -37,7 +36,7 @@ static func _room_distance(a: DungeonRoom, b: DungeonRoom) -> int:
     return absi(a_center.x - b_center.x) + absi(a_center.y - b_center.y)
 
 
-# Swallows "neighbour" into "first" unless it would touch a third room
+# Skipped if the merged room would touch a third room
 static func _try_combine(
     ctx: GenerationContext, first: DungeonRoom, neighbour: DungeonRoom
 ) -> void:

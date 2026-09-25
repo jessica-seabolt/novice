@@ -1,24 +1,24 @@
 class_name HallwayCarver extends RefCounted
-## Carves hallways into the floor, using A* to route them between rooms
+## Carves hallways into the floor
 
-## The maximum number of attempts to find a valid path
+## Path attempts before giving up
 const MAX_ATTEMPTS: int = 100
 
-## A snake hallway gets one waypoint per this many tiles between its doors
+## One snake waypoint per this many tiles
 const SNAKE_TILES_PER_WAYPOINT: int = 18
-## The most waypoints a snake hallway can have
+## Max waypoints per snake hallway
 const SNAKE_WAYPOINTS_MAX: int = 3
-## How far a waypoint can stray from the straight line between the doors
+## How far a waypoint can stray from the direct line
 const SNAKE_WANDER: int = 6
 
-## Shortest and longest a dead end can be
+## Min and max dead end length
 const DEAD_END_LENGTH_MIN: int = 3
 const DEAD_END_LENGTH_MAX: int = 15
 ## Chance a dead end turns at each step
 const DEAD_END_TURN_CHANCE: float = 0.25
 
 
-## Builds this floor's A* grid, with rooms and the border marked solid
+## Rooms and the border are solid
 static func build_astar(ctx: GenerationContext) -> void:
     var astar: AStarGrid2D = AStarGrid2D.new()
     astar.region = Rect2i(0, 0, ctx.grid.width, ctx.grid.height)
@@ -37,7 +37,7 @@ static func build_astar(ctx: GenerationContext) -> void:
     ctx.astar = astar
 
 
-## Carves a hallway between the closest doors of two rooms
+## Uses the closest pair of doors
 static func carve_between(ctx: GenerationContext, room_a: DungeonRoom, room_b: DungeonRoom) -> void:
     var doors: Array[Vector2i] = _best_door_pair(ctx.grid, room_a, room_b)
     if doors.is_empty():
@@ -47,7 +47,7 @@ static func carve_between(ctx: GenerationContext, room_a: DungeonRoom, room_b: D
     _carve(ctx.grid, path)
 
 
-## Carves a hallway between two rooms that winds through random waypoints
+## Winds through random waypoints
 static func carve_snake_between(
     ctx: GenerationContext, room_a: DungeonRoom, room_b: DungeonRoom
 ) -> void:
@@ -58,7 +58,7 @@ static func carve_snake_between(
     var start: Vector2i = doors[0]
     var goal: Vector2i = doors[1]
 
-    # Longer hallways get more waypoints, so they wind about as often per tile
+    # Waypoints scale with length
     var distance: int = absi(start.x - goal.x) + absi(start.y - goal.y)
     var count: int = clampi(
         floori(float(distance) / SNAKE_TILES_PER_WAYPOINT), 1, SNAKE_WAYPOINTS_MAX
@@ -70,8 +70,7 @@ static func carve_snake_between(
         points.append(_snake_waypoint(ctx, start, goal, t))
     points.append(goal)
 
-    # A leg that can't be pathed skips its waypoint
-    # The next leg starts from the last point reached
+    # An unreachable waypoint is skipped
     var carved: Dictionary = {}
     var current: Vector2i = start
     for i: int in range(1, points.size()):
@@ -87,8 +86,7 @@ static func carve_snake_between(
     _trim_dead_ends(ctx.grid, carved)
 
 
-## Carves a hallway loop just inside the border and returns its tiles
-## Rooms touching the loop become part of it rather than being detoured around
+## Returns its tiles; rooms touching it become part of it
 static func carve_ring(ctx: GenerationContext) -> Array[Vector2i]:
     var interior: Rect2i = ctx.grid.get_interior()
     var first: Vector2i = interior.position
@@ -111,7 +109,7 @@ static func carve_ring(ctx: GenerationContext) -> Array[Vector2i]:
             _carve_ring_tile(ctx.grid, p, step, carved)
             p += step
 
-    # Skipping tiles beside a room can strand one-tile nubs at its corners
+    # Skipped tiles can leave nubs at room corners
     _trim_dead_ends(ctx.grid, carved)
 
     var ring: Array[Vector2i] = []
@@ -119,7 +117,7 @@ static func carve_ring(ctx: GenerationContext) -> Array[Vector2i]:
     return ring
 
 
-## Carves a hallway from a room's closest door to the closest tile of the ring
+## From the room's closest door to the closest ring tile
 static func carve_to_ring(
     ctx: GenerationContext, room: DungeonRoom, ring: Array[Vector2i]
 ) -> void:
@@ -131,8 +129,7 @@ static func carve_to_ring(
     _carve(ctx.grid, path)
 
 
-## Carves a short hallway out of a hallway tile that leads nowhere
-## Returns false and carves nothing if it couldn't reach the minimum length
+## Returns false, carving nothing, if it can't reach the minimum length
 static func carve_dead_end(ctx: GenerationContext, from: Vector2i) -> bool:
     var length: int = ctx.rng.randi_range(DEAD_END_LENGTH_MIN, DEAD_END_LENGTH_MAX)
     var cardinals: Array[Vector2i] = FloorGrid.CARDINALS
@@ -141,7 +138,7 @@ static func carve_dead_end(ctx: GenerationContext, from: Vector2i) -> bool:
     var p: Vector2i = from
 
     for _step: int in range(length):
-        # Turning swaps x and y for a perpendicular direction, then picks which side
+        # Swapping x and y turns 90 degrees
         if not tiles.is_empty() and ctx.rng.randf() < DEAD_END_TURN_CHANCE:
             var side: int = 1 if ctx.rng.randf() < 0.5 else -1
             direction = Vector2i(direction.y, direction.x) * side
@@ -161,9 +158,7 @@ static func carve_dead_end(ctx: GenerationContext, from: Vector2i) -> bool:
     return false
 
 
-# Asks A* for a route, then walks it as if carving it
-# Tiles cutting through a room or making a 2x2 ground square get blocked
-# Repeats until a clean route is found or MAX_ATTEMPTS is exhausted
+# Retries A* with any tile that cuts a room or makes 2x2 ground blocked
 static func _find_path(ctx: GenerationContext, start: Vector2i, goal: Vector2i) -> Array[Vector2i]:
     var temp_blocked: Array[Vector2i] = []
 
@@ -229,7 +224,7 @@ static func _door_candidates(grid: FloorGrid, room: DungeonRoom) -> Array[Vector
     var a: Rect2i = room.area
     var candidates: Array[Vector2i] = []
 
-    # Left and right cells for each row, top and bottom cells for each column
+    # Every tile just outside the room's edges
     for y: int in range(a.position.y, a.end.y):
         candidates.append(Vector2i(a.position.x - 1, y))
         candidates.append(Vector2i(a.end.x, y))
@@ -244,7 +239,7 @@ static func _door_candidates(grid: FloorGrid, room: DungeonRoom) -> Array[Vector
     return valid
 
 
-# The closest pair of points between two lists, or an empty array if either list is empty
+# Empty if either list is empty
 static func _closest_pair(a: Array[Vector2i], b: Array[Vector2i]) -> Array[Vector2i]:
     if a.is_empty() or b.is_empty():
         return []
@@ -272,7 +267,7 @@ static func _would_create_2x2(grid: FloorGrid, p: Vector2i, planned: Dictionary)
         Vector2i(p.x, p.y),
     ]
 
-    # Check each of the four possible 2x2 squares that could be formed with the new tile
+    # Each 2x2 square that includes p
     for origin: Vector2i in origins:
         var corners: Array[Vector2i] = [
             origin,
@@ -288,7 +283,6 @@ static func _would_create_2x2(grid: FloorGrid, p: Vector2i, planned: Dictionary)
 static func _all_would_be_ground(
     grid: FloorGrid, corners: Array[Vector2i], p: Vector2i, planned: Dictionary
 ) -> bool:
-    # Compare each corner of a 2x2 square to see if it would be ground after carving
     for c: Vector2i in corners:
         if not grid.is_in_bounds(c):
             return false
@@ -297,7 +291,7 @@ static func _all_would_be_ground(
     return true
 
 
-# A point partway along the line from start to goal, nudged randomly and kept off the border
+# A point t of the way from start to goal, nudged randomly
 static func _snake_waypoint(
     ctx: GenerationContext, start: Vector2i, goal: Vector2i, t: float
 ) -> Vector2i:
@@ -311,12 +305,11 @@ static func _snake_waypoint(
     return (on_line + nudge).clamp(interior.position, interior.end - Vector2i.ONE)
 
 
-# Skips the middle of any stretch running alongside a room, which would otherwise be 2x2 ground
-# Both ends of the stretch still get carved, so they meet the room and it carries the ring across
+# Skips the middle of a stretch beside a room; its ends join the ring to the room
 static func _carve_ring_tile(
     grid: FloorGrid, p: Vector2i, step: Vector2i, carved: Dictionary
 ) -> void:
-    # Going clockwise, the inside of the ring is always a right turn from the step
+    # Clockwise, so inward is a right turn
     var inward: Vector2i = Vector2i(-step.y, step.x)
     var mid_stretch: bool = (
         grid.is_room(p + inward)
@@ -324,14 +317,14 @@ static func _carve_ring_tile(
         and grid.is_room(p + step + inward)
     )
 
-    # The 2x2 check still catches a room tucked into a corner of the ring
+    # Also catches rooms tucked into a ring corner
     if mid_stretch or not grid.is_wall(p) or _would_create_2x2(grid, p, {}):
         return
     grid.set_tile_type(p, DungeonTile.TileType.GROUND)
     carved[p] = true
 
 
-# Walls back up any carved tile with at most one ground neighbour, until none are left
+# Repeatedly walls up carved tiles with one or no ground neighbours
 static func _trim_dead_ends(grid: FloorGrid, carved: Dictionary) -> void:
     var trimmed: bool = true
     while trimmed:
@@ -352,7 +345,7 @@ static func _ground_neighbour_count(grid: FloorGrid, p: Vector2i) -> int:
     return count
 
 
-# A dead end can only grow into rock that touches no ground but the tile it came from
+# Only into rock touching no ground but the tile it came from
 static func _can_extend_dead_end(grid: FloorGrid, next: Vector2i, from: Vector2i) -> bool:
     if grid.is_border(next) or not grid.is_wall(next):
         return false

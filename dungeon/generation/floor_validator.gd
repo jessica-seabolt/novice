@@ -1,10 +1,10 @@
 class_name FloorValidator extends RefCounted
-## Makes sure every room can be reached from every other room on foot, carving links if not
+## Makes sure every room can reach every other room on foot
 
 
-## Connects any rooms that can't be reached without crossing walls or special terrain
+## Carves links until one ground region touches every room
 static func validate(ctx: GenerationContext) -> void:
-    # Each repair links at least one more room, so this many is always enough
+    # Each repair reaches at least one more room
     for _repair: int in range(ctx.rooms.size()):
         var labels: Dictionary = _label_regions(ctx.grid)
         var region_rooms: Dictionary = _rooms_by_region(ctx.grid, labels)
@@ -21,7 +21,7 @@ static func validate(ctx: GenerationContext) -> void:
             ctx.grid.set_tile_type(p, DungeonTile.TileType.GROUND)
 
 
-# Maps every ground tile to the number of the connected region it belongs to
+# Maps each ground tile to its region number
 static func _label_regions(grid: FloorGrid) -> Dictionary:
     var labels: Dictionary = {}
     var next_region: int = 0
@@ -54,7 +54,7 @@ static func _flood_fill(grid: FloorGrid, start: Vector2i, region: int, labels: D
             queue.append(neighbour)
 
 
-# For each region that holds room tiles, the set of room ids it touches
+# Region number to the set of room ids it touches
 static func _rooms_by_region(grid: FloorGrid, labels: Dictionary) -> Dictionary:
     var region_rooms: Dictionary = {}
 
@@ -70,7 +70,7 @@ static func _rooms_by_region(grid: FloorGrid, labels: Dictionary) -> Dictionary:
     return region_rooms
 
 
-# The region touching the most rooms, or the bigger one when two regions touch as many
+# Most rooms wins; ties go to the bigger region
 static func _main_region(region_rooms: Dictionary, region_sizes: Dictionary) -> int:
     var best: int = -1
     for region: int in region_rooms:
@@ -85,8 +85,7 @@ static func _main_region(region_rooms: Dictionary, region_sizes: Dictionary) -> 
     return best
 
 
-# Shortest route from the main region, through walls and special terrain, to a region holding
-# a room the main region can't reach yet
+# Shortest route through walls and water to a region with a missing room
 static func _path_to_missing_room(
     grid: FloorGrid, labels: Dictionary, region_rooms: Dictionary, main: int
 ) -> Array[Vector2i]:
@@ -124,7 +123,7 @@ static func _has_missing_room(region_rooms: Dictionary, region: int, main: int) 
     return false
 
 
-# Follows came_from links back to the main region, collecting every tile along the way
+# Walks came_from back to the main region
 static func _trace_back(came_from: Dictionary, from: Vector2i) -> Array[Vector2i]:
     var path: Array[Vector2i] = []
     var p: Vector2i = from

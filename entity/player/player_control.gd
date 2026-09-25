@@ -1,18 +1,17 @@
 class_name PlayerControl extends Node
-## Lets the player choose their entity's moves from input, including running
-## Must be a direct child of the Entity it controls
+## Moves its entity from player input, including running
 
-## How long one step takes to slide, in seconds
+## Seconds per walking step
 const STEP_DURATION: float = 0.15
-## How long one running step takes to slide, in seconds
+## Seconds per running step
 const RUN_STEP_DURATION: float = 0.06
-## How long the buffer is to wait for diagonal input
+## Seconds to wait for a second key to make a diagonal
 const DIAGONAL_GRACE: float = 0.05
 const MOVE_ACTIONS: Array[StringName] = [&"move_up", &"move_down", &"move_left", &"move_right"]
 
-# The direction of the current run, or zero when not running
+# Zero when not running
 var _run_direction: Vector2i = Vector2i.ZERO
-# Set when a run stops, so a direction still held from it doesn't walk on by itself
+# Stops a key held from a run from walking on
 var _needs_fresh_press: bool = false
 
 @onready var _entity: Entity = get_parent() as Entity
@@ -20,7 +19,7 @@ var _needs_fresh_press: bool = false
 
 func _ready() -> void:
     _entity.set_turn(_take_turn)
-    # Arriving on a floor never carries a run or a held key over
+    # New floors never carry a run over
     _entity.placed.connect(_stop_run)
 
 
@@ -32,8 +31,6 @@ func _unhandled_input(event: InputEvent) -> void:
     get_viewport().set_input_as_handled()
 
 
-# Waits for the player to choose a move they're allowed to make, then makes it
-# While running, keeps stepping on its own until RunRules says to stop
 func _take_turn() -> void:
     await _entity.finish_slide()
 
@@ -47,21 +44,19 @@ func _take_turn() -> void:
     while true:
         var direction: Vector2i = await _wait_for_direction()
         if MoveRules.can_step(state, _entity.grid_position, direction):
-            # A direction pressed with sprint held starts a run, and that press is its first step
+            # Sprint held starts a run
             if Input.is_action_pressed(&"sprint"):
                 _run_direction = direction
                 _step(direction, RUN_STEP_DURATION)
             else:
                 _step(direction, STEP_DURATION)
             return
-        # Blocked moves cost nothing, but wait a frame so holding
-        # a direction into a wall doesn't freeze the game
+        # Wait a frame so holding into a wall doesn't freeze the game
         await get_tree().process_frame
 
 
-# Returns the held direction, waiting for one if nothing is held
 func _wait_for_direction() -> Vector2i:
-    # After a run stops, everything has to be let go before walking again
+    # Everything must be let go after a run
     if _needs_fresh_press:
         while _held_direction() != Vector2i.ZERO:
             await get_tree().process_frame
@@ -69,7 +64,7 @@ func _wait_for_direction() -> Vector2i:
 
     var direction: Vector2i = _held_direction()
     if direction != Vector2i.ZERO:
-        return direction # Still held from the last step, keep walking
+        return direction # Held from the last step
 
     while direction == Vector2i.ZERO:
         await get_tree().process_frame
@@ -84,7 +79,7 @@ func _wait_for_direction() -> Vector2i:
     return direction
 
 
-# Sets the floor's pace to this step's speed, so everything else slides along with the player
+# Everything else slides at the player's pace
 func _step(direction: Vector2i, duration: float) -> void:
     _entity.floor_state.step_duration = duration
     _entity.step(direction, duration)
@@ -95,7 +90,6 @@ func _stop_run() -> void:
     _needs_fresh_press = true
 
 
-# The direction currently held, including diagonals, or zero if nothing is held
 func _held_direction() -> Vector2i:
     var input: Vector2 = Input.get_vector("move_left", "move_right", "move_up", "move_down")
     return Vector2i(signi(roundi(input.x)), signi(roundi(input.y)))

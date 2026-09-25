@@ -1,10 +1,9 @@
 class_name WanderAI extends Node
-## Walks its entity from room to room: heads for a random room it isn't in, then picks another
-## Must be a direct child of the Entity it controls
+## Walks its entity from room to room
 
 const NO_ROOM: int = -1
 
-# Tiles still to walk to the target, next one first
+# Next tile first
 var _path: Array[Vector2i] = []
 var _target_room: int = NO_ROOM
 
@@ -16,14 +15,13 @@ func _ready() -> void:
     _entity.placed.connect(_forget_target)
 
 
-# Picks a new target when needed, then takes one step toward it
-# A blocked step waits this turn and plans a fresh path next turn
+# A blocked step waits and replans next turn
 func _take_turn() -> void:
     var state: FloorState = _entity.floor_state
     if _path.is_empty() or _in_target_room(state):
         _plan(state)
     if _path.is_empty():
-        return # Nowhere to go, like a floor with only one room
+        return # Only one room
 
     var direction: Vector2i = _path[0] - _entity.grid_position
     if not MoveRules.can_step(state, _entity.grid_position, direction):
@@ -34,7 +32,7 @@ func _take_turn() -> void:
     _entity.step(direction, state.step_duration)
 
 
-# Chooses a random room other than the one it's in, then a reachable tile in that room to walk to
+# Paths to a random tile in a random other room
 func _plan(state: FloorState) -> void:
     _path.clear()
     var here: Vector2i = _entity.grid_position
@@ -59,7 +57,7 @@ func _plan(state: FloorState) -> void:
     var goal: Vector2i = tiles[state.rng.randi_range(0, tiles.size() - 1)]
     _path = state.pathfinder.get_id_path(here, goal)
     if not _path.is_empty():
-        _path.remove_at(0) # The first tile is the one it's standing on
+        _path.remove_at(0) # Its own tile
 
 
 func _in_target_room(state: FloorState) -> bool:

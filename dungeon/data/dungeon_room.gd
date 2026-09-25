@@ -1,5 +1,5 @@
 class_name DungeonRoom extends RefCounted
-## Represents a single room in the dungeon, with an ID and a rectangular area
+## A rectangular room on a floor
 
 var id: int
 var area: Rect2i

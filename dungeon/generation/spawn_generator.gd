@@ -4,8 +4,7 @@ class_name SpawnGenerator extends RefCounted
 const NO_TILE: Vector2i = Vector2i(-1, -1)
 
 
-## Places the player, the stairs and the mobs, each on a reachable tile in a random room
-## Stairs never go in a doorway
+## Everything goes on a reachable room tile; stairs never go in a doorway
 static func generate(ctx: GenerationContext) -> void:
     ctx.player_spawn = _random_room_tile(ctx, [])
 
@@ -19,7 +18,7 @@ static func generate(ctx: GenerationContext) -> void:
 
     var mob_count: int = ctx.rng.randi_range(ctx.config.mob_count_min, ctx.config.mob_count_max)
 
-    # Mobs may start on the stairs or in doorways, just never on the player or each other
+    # Mobs may start on stairs or in doorways
     var taken: Array[Vector2i] = [ctx.player_spawn]
     for _i: int in range(mob_count):
         var spawn_tile: Vector2i = _random_room_tile(ctx, taken)
@@ -30,7 +29,7 @@ static func generate(ctx: GenerationContext) -> void:
         taken.append(spawn_tile)
 
 
-# A random reachable tile in a random room, skipping excluded tiles
+# NO_TILE if no room has a free tile
 static func _random_room_tile(ctx: GenerationContext, excluded: Array[Vector2i]) -> Vector2i:
     var start: int = ctx.rng.randi_range(0, ctx.rooms.size() - 1)
     for i: int in range(ctx.rooms.size()):

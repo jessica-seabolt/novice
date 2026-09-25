@@ -1,5 +1,5 @@
 extends Node
-## Singleton for managing various debug settings
+## Debug settings
 
-## When true, prints the resulting FloorGrid to the console after Dungeon floor generation
+## Prints each generated floor to the console
 const DEBUG_GRID: bool = true

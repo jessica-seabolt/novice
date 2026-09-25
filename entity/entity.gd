@@ -13,7 +13,7 @@ var _slide_target: Vector2
 var _turn: Callable
 
 
-## Places the entity on a floor, cancelling any slide still in progress
+## Places the entity, cancelling any slide in progress
 func setup(state: FloorState, tilemap_layer: TileMapLayer, spawn: Vector2i) -> void:
     if _step_tween != null:
         _step_tween.kill()
@@ -26,7 +26,7 @@ func setup(state: FloorState, tilemap_layer: TileMapLayer, spawn: Vector2i) -> v
     placed.emit()
 
 
-## Gives the entity the function that decides and makes its move each turn
+## Set by the component that controls this entity
 func set_turn(turn: Callable) -> void:
     _turn = turn
 
@@ -35,14 +35,13 @@ func take_turn() -> void:
     await _turn.call()
 
 
-## Moves one tile on the grid right away, then slides the sprite over to match
+## Moves on the grid at once, then slides the sprite to match
 func step(direction: Vector2i, duration: float) -> void:
     var to: Vector2i = grid_position + direction
     floor_state.occupancy.move(self, grid_position, to)
     grid_position = to
 
-    # A slide that hasn't quite finished is completed rather than cut short, so its last frame
-    # of movement isn't lost
+    # Finish an almost-done slide rather than cutting its last frame
     if _step_tween != null and _step_tween.is_running():
         _step_tween.kill()
         position = _slide_target
@@ -52,7 +51,7 @@ func step(direction: Vector2i, duration: float) -> void:
     _step_tween.tween_property(self, "position", _slide_target, duration)
 
 
-## Waits until the last step has finished sliding, if it hasn't already
+## Waits for the current slide to end
 func finish_slide() -> void:
     if _step_tween != null and _step_tween.is_running():
         await _step_tween.finished

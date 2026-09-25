@@ -1,15 +1,14 @@
 class_name FloorState extends RefCounted
-## Everything entities need to know about the floor they're on, rebuilt for each floor
+## What entities need to know about the current floor
 
 var grid: FloorGrid
 var rooms: Array[DungeonRoom]
 var reachable_tiles: Array[Vector2i]
 var rng: RandomNumberGenerator
 var occupancy: Occupancy = Occupancy.new()
-## How long a step's slide takes this turn
-## The player sets it as they move, so everything slides at the player's pace
+## Slide time for this turn, set by the player so everything moves at their pace
 var step_duration: float = 0.15
-## 8-direction paths over the finished floor, shared by every entity that needs one
+## Shared 8-direction pathfinder
 var pathfinder: AStarGrid2D
 
 
@@ -26,9 +25,7 @@ func _init(
     pathfinder = _build_pathfinder(floor_grid)
 
 
-# Walls and water are solid, and a diagonal step is only allowed when both tiles beside its
-# corner are open, so every step a path takes is one MoveRules allows too
-# Entities aren't included, since they move every turn; blocking is checked as each step is taken
+# Walls and water are solid; entities are checked as each step is taken
 static func _build_pathfinder(floor_grid: FloorGrid) -> AStarGrid2D:
     var astar: AStarGrid2D = AStarGrid2D.new()
     astar.region = Rect2i(0, 0, floor_grid.width, floor_grid.height)

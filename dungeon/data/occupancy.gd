@@ -1,7 +1,6 @@
 class_name Occupancy extends RefCounted
-## Tracks which entity is standing on which tile of a floor
+## Tracks which entity stands on which tile
 
-# Maps a tile to the entity standing on it
 var _entities: Dictionary = {}
 
 
@@ -9,7 +8,7 @@ func is_occupied(p: Vector2i) -> bool:
     return _entities.has(p)
 
 
-## The entity standing on p, or null if the tile is empty
+## Null if the tile is empty
 func get_entity(p: Vector2i) -> Entity:
     return _entities.get(p)
 

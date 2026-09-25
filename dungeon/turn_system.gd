@@ -15,7 +15,7 @@ func remove_actor(actor: Entity) -> void:
     _actors.erase(actor)
 
 
-## Runs turns one actor at a time, until stop() is called
+## Runs until stop() is called
 func run() -> void:
     if _actors.is_empty():
         return
@@ -28,6 +28,6 @@ func run() -> void:
                 return
 
 
-## Ends the turn loop once the current actor's turn is over
+## Takes effect once the current turn ends
 func stop() -> void:
     _running = false

@@ -1,14 +1,14 @@
 class_name SpecialTerrainCarver extends RefCounted
-## Carves lakes and rivers into the floor as SPECIAL_TERRAIN
+## Carves lakes and rivers
 
 ## A lake's starting spread chance
 const LAKE_SPREAD_BASE: float = 0.93
 ## How much a lake's spread chance decreases with distance
 const LAKE_SPREAD_FALLOFF: float = 0.06
-## The maximum radius a lake can grow to
+## Max lake radius
 const LAKE_RADIUS_MAX: int = 15
 
-## Minimum and maximum straight segment lengths for river generation
+## Min and max length of a river's straight runs
 const RIVER_STRAIGHT_MIN: int = 1
 const RIVER_STRAIGHT_MAX: int = 10
 
@@ -25,8 +25,7 @@ const RIVER_WEIGHT_TOWARD_CENTER: float = 0.35
 const RIVER_WEIGHT_AWAY_FROM_CENTER: float = 0.25
 
 
-## Grows a lake outward from start, painting only wall tiles
-## Spread chance shrinks with distance, so edges come out ragged rather than diamond-shaped
+## Paints only walls; spread chance falls with distance for ragged edges
 static func carve_lake(grid: FloorGrid, start: Vector2i, rng: RandomNumberGenerator) -> void:
     var radius: int = rng.randi_range(1, LAKE_RADIUS_MAX)
     var queue: Array[Vector2i] = [start]
@@ -59,7 +58,6 @@ static func carve_lake(grid: FloorGrid, start: Vector2i, rng: RandomNumberGenera
             distances.append(d + 1)
 
 
-## Carves a river into the grid as SPECIAL_TERRAIN
 static func carve_river(
     grid: FloorGrid,
     start: Vector2i,
@@ -82,16 +80,16 @@ static func carve_river(
         var next: Vector2i = p + direction
 
         if grid.is_border(next):
-            # River is running vertically and hit the border, stop
+            # Hit the border head-on
             if direction == heading:
                 return
 
-            # River is running horizontally and hit the border, check if it can move vertically
+            # Hit a side border, so turn back to the heading
             direction = heading
             straight = 0
             next = p + heading
 
-            # River still hits border vertically, stop
+            # Blocked both ways
             if grid.is_border(next):
                 return
 
@@ -101,7 +99,7 @@ static func carve_river(
 
 
 static func _carve_river_tile(grid: FloorGrid, p: Vector2i) -> void:
-    # Hallways never get carved
+    # Hallways stay as bridges
     if grid.is_hallway(p):
         return
 
@@ -116,14 +114,14 @@ static func _pick_river_direction(
     var to_left: int = p.x - border
     var to_right: int = (grid.width - 1 - border) - p.x
 
-    # Weights always sum to 1.0, so right gets whatever vertical and left leave over
+    # Right gets whatever's left of 1.0
     var left: float = RIVER_WEIGHT_SIDE
     if to_left < RIVER_EDGE_MARGIN:
         left = RIVER_WEIGHT_TOWARD_WALL
     elif to_right < RIVER_EDGE_MARGIN:
         left = RIVER_WEIGHT_AWAY_FROM_WALL
     elif to_left > to_right + RIVER_CENTER_BIAS:
-        # More room on the left, so lean left to drift back toward center
+        # More room on the left, so drift back left
         left = RIVER_WEIGHT_TOWARD_CENTER
     elif to_right > to_left + RIVER_CENTER_BIAS:
         left = RIVER_WEIGHT_AWAY_FROM_CENTER

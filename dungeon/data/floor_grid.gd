@@ -1,12 +1,11 @@
 class_name FloorGrid extends RefCounted
-## Represents a floor of a dungeon via a 2D array of DungeonTile objects
-## Provides utility functions for querying and modifying the grid
+## A floor's tiles, with methods for reading and changing them
 
 const BORDER_SIZE: int = 2
 const MAX_WIDTH: int = 84
 const MAX_HEIGHT: int = 52
 
-## The four directions to a tile's walkable neighbours
+## The four straight directions
 const CARDINALS: Array[Vector2i] = [
     Vector2i(0, -1), # Up
     Vector2i(1, 0), # Right
@@ -17,7 +16,6 @@ const CARDINALS: Array[Vector2i] = [
 var width: int = 0
 var height: int = 0
 
-# Uses a 2D Array to store the grid
 var _tiles: Array[Array] = []
 
 
@@ -52,7 +50,7 @@ func is_room(p: Vector2i) -> bool:
     return _tiles[p.y][p.x].room_id != -1
 
 
-## A ground tile that is not part of any room
+## Ground that isn't part of a room
 func is_hallway(p: Vector2i) -> bool:
     return is_ground(p) and not is_room(p)
 
@@ -106,7 +104,7 @@ func is_border(p: Vector2i) -> bool:
     )
 
 
-## Everything inside the border, where rooms and hallways can go
+## Everything inside the border
 func get_interior() -> Rect2i:
     return Rect2i(BORDER_SIZE, BORDER_SIZE, width - BORDER_SIZE * 2, height - BORDER_SIZE * 2)
 
@@ -125,13 +123,11 @@ func print_grid() -> void:
             elif tile.room_id == -1:
                 row += "."
             else:
-                # Print the room ID modulo 10 to keep it a single digit
-                # IDs may wrap in the display, but their stored values remain correct
+                # Last digit only, to keep columns aligned
                 row += "%s" % (tile.room_id % 10)
         print(row)
 
 
-# Ensures the border is always TileType.WALL
 func _enforce_border() -> void:
     for y: int in range(height):
         for x: int in range(width):

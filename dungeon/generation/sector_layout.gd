@@ -2,13 +2,13 @@ class_name SectorLayout extends RefCounted
 ## Decides how many sectors a floor is divided into and which are valid
 
 enum Orientation {
-    STANDARD, ## Default orientation, one room per sector
-    CHECKERBOARD, ## Alternate sectors are valid, creating a checkerboard pattern
-    PLUS, ## Use the middle row and column for sectors, creating a plus shape
-    CROSS, ## Use the diagonals of the grid for sectors, creating a cross shape
-    CIRCLE, ## Make a single ring of sectors
-    HUB, ## Use the center sector for a hub room, with other rooms around it
-    SWIRL, ## Make a spiral of sectors
+    STANDARD, ## One room per sector
+    CHECKERBOARD, ## Alternating sectors
+    PLUS, ## The middle row and column
+    CROSS, ## Both diagonals
+    CIRCLE, ## A ring of sectors
+    HUB, ## A ring around a center hub room
+    SWIRL, ## A spiral of sectors
     RANDOM, ## Resolves to one of the other orientations at random
 }
 
@@ -68,10 +68,10 @@ static func sector_grid_size(target_rooms: int, orientation: SectorLayout.Orient
 static func _total_sectors(target_rooms: int, orientation: SectorLayout.Orientation) -> int:
     match orientation:
         SectorLayout.Orientation.CHECKERBOARD:
-            # Twice as many sectors as there are rooms to make a checkerboard pattern
+            # Twice the sectors, since only half are used
             return target_rooms * CHECKERBOARD_MULTIPLIER
         SectorLayout.Orientation.PLUS, SectorLayout.Orientation.CROSS:
-            # Make the grid square by rounding up to the nearest perfect square
+            # Rounds up to a square grid
             var side: int = ceili(sqrt(float(target_rooms)))
             return side * side
         SectorLayout.Orientation.CIRCLE, SectorLayout.Orientation.HUB:
@@ -84,7 +84,6 @@ static func _total_sectors(target_rooms: int, orientation: SectorLayout.Orientat
             var side: int = 2 * _swirl_extent(offsets) + 1
             return side * side
         _:
-            # For other orientations, the number of sectors = the number of rooms
             return target_rooms
 
 
@@ -96,15 +95,13 @@ static func _is_valid(
 ) -> bool:
     match orientation:
         SectorLayout.Orientation.CHECKERBOARD:
-            # Alternate sectors to create a checkerboard pattern
             return (sector.x + sector.y) % CHECKERBOARD_MULTIPLIER == 0
         SectorLayout.Orientation.PLUS:
-            # Divide the dimensions to get middle row and column
             var mid_row: int = floori(float(dims.y) / 2.0)
             var mid_col: int = floori(float(dims.x) / 2.0)
             return sector.y == mid_row or sector.x == mid_col
         SectorLayout.Orientation.CROSS:
-            # Uses the formula for each diagonal of a square: y = x and y = -x + (n - 1)
+            # The diagonals y = x and y = -x + (n - 1)
             return sector.y == sector.x or sector.y == -sector.x + (dims.x - 1)
         SectorLayout.Orientation.CIRCLE:
             # A sector on the ring is one whose distance from center rounds to the radius
@@ -115,7 +112,7 @@ static func _is_valid(
             var ring: int = _get_distance_from_center(sector, dims)
             return ring == _get_radius_for_circle(target_rooms) or ring == 0
         SectorLayout.Orientation.SWIRL:
-            # Swirl should never call this function so this is an error
+            # Swirl never gets here
             push_error("Invalid call to _is_valid for SWIRL orientation")
             return false
         _:
@@ -132,8 +129,7 @@ static func _get_radius_for_circle(target_rooms: int) -> int:
     return roundi(target_rooms / TAU)
 
 
-# Walks an Archimedean spiral outward, collecting new sectors in order
-# The radius grows slowly to create multiple loops
+# Walks an Archimedean spiral outward, collecting sectors in order
 static func _swirl_offsets(target_rooms: int) -> Array[Vector2i]:
     var offsets: Array[Vector2i] = []
     var seen: Dictionary = {}
@@ -144,7 +140,7 @@ static func _swirl_offsets(target_rooms: int) -> Array[Vector2i]:
         var radius: float = (theta / TAU) * SWIRL_RADIUS_MULTIPLIER
         var offset: Vector2i = Vector2i(roundi(radius * cos(theta)), roundi(radius * sin(theta)))
 
-        # Skip sectors already reached; only a growing radius produces a genuinely new one
+        # Only a growing radius reaches a new sector
         if not seen.has(offset):
             seen[offset] = true
             offsets.append(offset)
@@ -166,7 +162,7 @@ static func _swirl_sectors(target_rooms: int) -> Array[Vector2i]:
     var offsets: Array[Vector2i] = _swirl_offsets(target_rooms)
     var extent: int = _swirl_extent(offsets)
 
-    # Offsets are center-relative (can be negative); shift them onto real grid coordinates
+    # Offsets are center-relative; shift onto grid coordinates
     var center: Vector2i = Vector2i(extent, extent)
     var sectors: Array[Vector2i] = []
     for offset: Vector2i in offsets:

@@ -1,5 +1,5 @@
 class_name FeatureRenderer extends RefCounted
-## Draws tile features like stairs onto the feature layer, using the generic tileset
+## Draws features like stairs onto the feature layer
 
 const GENERIC_SOURCE_ID: int = 0
 const STAIRS_UP_TILE: Vector2i = Vector2i(0, 0)

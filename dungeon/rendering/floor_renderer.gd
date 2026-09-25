@@ -1,7 +1,7 @@
 class_name FloorRenderer extends RefCounted
 ## Renders DungeonTiles to the TileMapLayer
 
-# Values must match the terrain indices in the TileSet's Better Terrain setup
+# Must match the TileSet's terrain indices
 enum Terrain {
     WALL,
     GROUND,
@@ -16,8 +16,7 @@ const TERRAIN_FOR_TILE: Dictionary = {
 }
 
 
-## Paints the grid onto the layer, surrounded by PADDING tiles of wall so the player
-## doesn't see void past the edge
+## Pads the grid with wall so no void shows past the edge
 static func render(grid: FloorGrid, layer: TileMapLayer) -> void:
     layer.clear()
 
@@ -33,7 +32,6 @@ static func render(grid: FloorGrid, layer: TileMapLayer) -> void:
     Autotiler.paint(layer, terrains, origin, size, FloorRenderer.Terrain.WALL)
 
 
-# Padding outside the grid is wall
 static func _terrain_at(grid: FloorGrid, p: Vector2i) -> int:
     return (
         TERRAIN_FOR_TILE[grid.get_tile(p).tile_type]

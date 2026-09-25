@@ -1,8 +1,7 @@
 class_name Autotiler extends RefCounted
-## Picks tile variants from the TileSet's native terrain peering bits
-## A set bit means that side must be that terrain
-## An empty side means anything but the tile's own terrain
-## Each distinct neighbourhood is scored once and cached
+## Picks tiles from the TileSet's terrain peering bits
+## A set side must be that terrain; an empty side must be anything but the tile's own
+## Each neighbourhood is scored once and cached
 
 const TERRAIN_SET: int = 0
 const REWARD: int = 3
@@ -53,8 +52,7 @@ const CORNER_SIDES: Dictionary = {
 }
 
 
-## Writes a tile to every cell of the rect at origin with the given size
-## "terrains" holds one terrain index per cell, row by row
+## "terrains" holds one terrain index per cell of the rect, row by row
 ## Neighbours outside the rect count as outside
 static func paint(
     layer: TileMapLayer,
@@ -122,8 +120,7 @@ static func _has_peering_bits(td: TileData) -> bool:
     return false
 
 
-# Sides always get a rule
-# Corners matter if both of its sides connect to the tile's own terrain
+# Corners only matter if both their sides match the tile's own terrain
 static func _rules_for(td: TileData) -> Dictionary:
     var rules: Dictionary = {}
     for side: TileSet.CellNeighbor in SIDES:

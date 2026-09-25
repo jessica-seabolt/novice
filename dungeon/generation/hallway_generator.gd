@@ -1,5 +1,5 @@
 class_name HallwayGenerator extends RefCounted
-## Decides which rooms get linked by hallways, and has HallwayCarver carve each one
+## Decides which rooms get linked by hallways
 
 enum Style {
     DIRECT, ## The shortest set of hallways that still links every room
@@ -7,7 +7,7 @@ enum Style {
     CHAIN, ## A nearest-neighbour path linking every room in sequence
     CIRCUIT, ## Like CHAIN, but the last room links back to the first
     WEB, ## Every room links to the room nearest the grid's center
-    BORDER, ## A ring hallway runs just inside the border, and every room links to it
+    BORDER, ## Every room links to a ring just inside the border
     RANDOM, ## Resolves to one of the other styles at random
 }
 
@@ -20,20 +20,20 @@ const RANDOMIZABLE_STYLES: Array[HallwayGenerator.Style] = [
     HallwayGenerator.Style.BORDER,
 ]
 
-## How many of the closest unlinked pairs an extra loop picks between
+## Closest unlinked pairs an extra loop picks from
 const LOOP_CANDIDATES: int = 3
-## How many times to attempt creating a dead end
+## Tries to place a dead end before giving up
 const DEAD_END_ATTEMPTS: int = 20
 
 
-## Links every room with hallways, using the config's hallway style
+## Links every room using the config's hallway style
 static func generate(ctx: GenerationContext) -> void:
     if ctx.rooms.size() <= 1:
         return
 
     HallwayCarver.build_astar(ctx)
 
-    # Each style decides which pairs of rooms to link, then every pair is carved below
+    # Each style picks the pairs, then they're all carved
     var style: HallwayGenerator.Style = resolve_style(ctx.config.hallway_style, ctx.rng)
     var pairs: Array[Vector2i] = []
     match style:
@@ -66,7 +66,7 @@ static func resolve_style(
     return RANDOMIZABLE_STYLES[index]
 
 
-# The closest pairs that join two separate groups, until every room is in one group
+# Minimum spanning tree over room distances
 static func _spanning_tree_pairs(rooms: Array[DungeonRoom]) -> Array[Vector2i]:
     var groups: Array[int] = []
     for i: int in range(rooms.size()):
@@ -75,7 +75,7 @@ static func _spanning_tree_pairs(rooms: Array[DungeonRoom]) -> Array[Vector2i]:
     var pairs: Array[Vector2i] = []
 
     for pair: Vector2i in _pairs_by_distance(rooms):
-        # A connected set of n rooms with no loops always has n - 1 hallways
+        # A tree of n rooms has n - 1 links
         if pairs.size() == rooms.size() - 1:
             break
 
@@ -90,24 +90,21 @@ static func _spanning_tree_pairs(rooms: Array[DungeonRoom]) -> Array[Vector2i]:
     return pairs
 
 
-# Rooms linked in nearest-neighbour order
 static func _chain_pairs(ctx: GenerationContext) -> Array[Vector2i]:
     return _pairs_in_order(_nearest_neighbour_random_start(ctx))
 
 
-# Rooms linked in nearest-neighbour order, with the last room linked back to the first
 static func _circuit_pairs(ctx: GenerationContext) -> Array[Vector2i]:
     var order: Array[int] = _nearest_neighbour_random_start(ctx)
     var pairs: Array[Vector2i] = _pairs_in_order(order)
 
-    # If there are only two rooms it's already a circuit
+    # Two rooms are already a circuit
     if order.size() > 2:
         pairs.append(_pair(order[order.size() - 1], order[0]))
 
     return pairs
 
 
-# Every room linked directly to the room nearest the grid's center
 static func _web_pairs(ctx: GenerationContext) -> Array[Vector2i]:
     var hub: int = _centermost_room(ctx)
     var pairs: Array[Vector2i] = []
@@ -120,8 +117,7 @@ static func _web_pairs(ctx: GenerationContext) -> Array[Vector2i]:
     return pairs
 
 
-# Carves a ring hallway and links every room to it, so no room pairs are needed
-# If no ring could be carved at all, falls back to web pairs instead
+# Carves the ring itself; falls back to web pairs if it can't
 static func _border(ctx: GenerationContext) -> Array[Vector2i]:
     var ring: Array[Vector2i] = HallwayCarver.carve_ring(ctx)
     if ring.is_empty():
@@ -134,7 +130,6 @@ static func _border(ctx: GenerationContext) -> Array[Vector2i]:
     return no_pairs
 
 
-# Carves one pair's hallway, winding it if the style is SNAKE
 static func _carve_pair(
     ctx: GenerationContext, pair: Vector2i, style: HallwayGenerator.Style
 ) -> void:
@@ -146,7 +141,7 @@ static func _carve_pair(
         HallwayCarver.carve_between(ctx, room_a, room_b)
 
 
-# Adds extra hallways beyond the style's own, so floors aren't strictly tree-shaped
+# Extra loops and dead ends beyond the style's own
 static func _add_extras(
     ctx: GenerationContext, pairs: Array[Vector2i], style: HallwayGenerator.Style
 ) -> void:
@@ -169,7 +164,7 @@ static func _add_extras(
             if pair not in pairs:
                 candidates.append(pair)
 
-        # Every pair of rooms is already linked
+        # Every pair is already linked
         if candidates.is_empty():
             return
 
@@ -201,7 +196,7 @@ static func _hallway_tiles(grid: FloorGrid) -> Array[Vector2i]:
     return tiles
 
 
-# Smaller index first, so the same two rooms always make the same pair
+# Smaller index first, so each pair has one form
 static func _pair(a: int, b: int) -> Vector2i:
     return Vector2i(mini(a, b), maxi(a, b))
 
@@ -221,14 +216,12 @@ static func _pairs_by_distance(rooms: Array[DungeonRoom]) -> Array[Vector2i]:
     return pairs
 
 
-# Relabels every room in the replaced group so both groups share one label
 static func _merge_groups(groups: Array[int], keep: int, replace: int) -> void:
     for i: int in range(groups.size()):
         if groups[i] == replace:
             groups[i] = keep
 
 
-# Consecutive rooms in the order become pairs
 static func _pairs_in_order(order: Array[int]) -> Array[Vector2i]:
     var pairs: Array[Vector2i] = []
     for i: int in range(order.size() - 1):
@@ -241,7 +234,6 @@ static func _nearest_neighbour_random_start(ctx: GenerationContext) -> Array[int
     return _nearest_neighbour_order(ctx.rooms, start)
 
 
-# Greedy walk from a given room, visiting the nearest unvisited room each step
 static func _nearest_neighbour_order(rooms: Array[DungeonRoom], start: int) -> Array[int]:
     var visited: Array[bool] = []
     visited.resize(rooms.size())

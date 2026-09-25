@@ -1,6 +1,6 @@
 class_name DungeonTile extends RefCounted
-## Represents a single tile in the dungeon, with a type, a room id, and a feature like stairs
-## Room id of -1 means it is not part of a DungeonRoom
+## One tile of a floor
+## A room id of -1 means it isn't in a room
 
 enum TileType {
     WALL,

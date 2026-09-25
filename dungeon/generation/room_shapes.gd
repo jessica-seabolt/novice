@@ -8,7 +8,7 @@ static func generate(
     sectors_across: int, sectors_down: int, sector: Vector2i, ctx: GenerationContext
 ) -> Rect2i:
 
-    # Find box's position and size on the grid
+    # The sector's area on the grid
     var usable_width: int = ctx.grid.width - FloorGrid.BORDER_SIZE * 2
     var usable_height: int = ctx.grid.height - FloorGrid.BORDER_SIZE * 2
     var sector_width: int = floori(float(usable_width) / float(sectors_across))
@@ -23,7 +23,6 @@ static func generate(
     var max_room_width: int = mini(ctx.config.room_width_max, sector_max_width)
     var max_room_height: int = mini(ctx.config.room_height_max, sector_max_height)
 
-    # Generate a random room size within the constraints
     var room_width: int = ctx.rng.randi_range(
         ctx.config.room_width_min, maxi(ctx.config.room_width_min, max_room_width)
     )
@@ -31,7 +30,6 @@ static func generate(
         ctx.config.room_height_min, maxi(ctx.config.room_height_min, max_room_height)
     )
 
-    # Roll random position for the room
     var min_x: int = sector_left + ROOM_GAP
     var min_y: int = sector_top + ROOM_GAP
     var max_x: int = sector_left + sector_width - room_width - ROOM_GAP

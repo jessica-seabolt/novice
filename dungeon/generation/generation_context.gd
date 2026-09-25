@@ -1,5 +1,5 @@
 class_name GenerationContext extends RefCounted
-## Holds state information for dungeon generation
+## State shared between generation steps
 
 var grid: FloorGrid
 var config: DungeonConfig
@@ -27,7 +27,6 @@ func make_room(area: Rect2i) -> DungeonRoom:
     return room
 
 
-## Clears any rooms placed so far
 func reset_rooms() -> void:
     rooms.clear()
     _next_room_id = 0
