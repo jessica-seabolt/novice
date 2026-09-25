@@ -22,18 +22,25 @@ static func should_continue(state: FloorState, at: Vector2i, direction: Vector2i
     return _is_diagonal(direction) or not _side_passage(grid, at, direction)
 
 
-## Whether stepping from "from" puts the runner next to an entity it wasn't already next to
+## Entities that stepping from "from" puts the runner next to, that it wasn't already next to
 ## Temporary until line of sight
-static func steps_into_contact(state: FloorState, from: Vector2i, direction: Vector2i) -> bool:
+static func new_neighbours(
+    state: FloorState, from: Vector2i, direction: Vector2i
+) -> Array[Entity]:
     var to: Vector2i = from + direction
+    var found: Array[Entity] = []
     for y: int in range(-1, 2):
         for x: int in range(-1, 2):
             var p: Vector2i = to + Vector2i(x, y)
             if p == to or p == from or not state.occupancy.is_occupied(p):
                 continue
-            if absi(p.x - from.x) > 1 or absi(p.y - from.y) > 1:
-                return true
-    return false
+            if not is_adjacent(p, from):
+                found.append(state.occupancy.get_entity(p))
+    return found
+
+
+static func is_adjacent(a: Vector2i, b: Vector2i) -> bool:
+    return absi(a.x - b.x) <= 1 and absi(a.y - b.y) <= 1
 
 
 # Open ground beside the runner with a wall at either end along the run

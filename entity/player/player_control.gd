@@ -13,8 +13,8 @@ const MOVE_ACTIONS: Array[StringName] = [&"move_up", &"move_down", &"move_left",
 var _run_direction: Vector2i = Vector2i.ZERO
 # Stops a key held from a run from walking on
 var _needs_fresh_press: bool = false
-# Set by a step that lands next to an entity
-var _stepped_into_contact: bool = false
+# Entities the last step landed next to
+var _new_neighbours: Array[Entity] = []
 # Set when the stick returns to centre during a run
 var _stick_centred: bool = false
 var _spell_requested: bool = false
@@ -54,7 +54,7 @@ func _take_turn() -> void:
         return
     if _run_direction != Vector2i.ZERO:
         var keep_running: bool = (
-            not _stepped_into_contact
+            not _still_next_to_new_neighbour()
             and RunRules.should_continue(state, _entity.grid_position, _run_direction)
         )
         if keep_running:
@@ -122,7 +122,7 @@ func _wait_for_direction() -> Vector2i:
 func _step(direction: Vector2i, duration: float) -> void:
     var state: FloorState = _entity.floor_state
     # Entities walking up to the player don't count
-    _stepped_into_contact = RunRules.steps_into_contact(state, _entity.grid_position, direction)
+    _new_neighbours = RunRules.new_neighbours(state, _entity.grid_position, direction)
     state.step_duration = duration
     _entity.step(direction, duration)
 
@@ -134,6 +134,15 @@ func _cast_basic_spell() -> void:
     _entity.floor_state.step_duration = STEP_DURATION
     _entity.hold(STEP_DURATION)
     BasicSpell.cast(_entity)
+
+
+# Ones that have since moved away, like a mob being chased, don't stop the run
+func _still_next_to_new_neighbour() -> bool:
+    for entity: Entity in _new_neighbours:
+        var here: Vector2i = _entity.grid_position
+        if is_instance_valid(entity) and RunRules.is_adjacent(entity.grid_position, here):
+            return true
+    return false
 
 
 func _stop_run() -> void:
