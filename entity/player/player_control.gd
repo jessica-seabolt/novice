@@ -4,7 +4,7 @@ class_name PlayerControl extends Node
 ## Seconds per walking step
 const STEP_DURATION: float = 0.15
 ## Seconds per running step
-const RUN_STEP_DURATION: float = 0.06
+const RUN_STEP_DURATION: float = 0.03
 ## Seconds to wait for a second key to make a diagonal
 const DIAGONAL_GRACE: float = 0.05
 const MOVE_ACTIONS: Array[StringName] = [&"move_up", &"move_down", &"move_left", &"move_right"]
