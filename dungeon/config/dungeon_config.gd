@@ -2,8 +2,8 @@ class_name DungeonConfig extends Resource
 ## Holds configuration for dungeon generation, including room sizes, counts, and layout
 
 enum StairDirection {
-    DOWN, ## Each floor leads deeper
-    UP, ## Each floor leads higher, like a tower
+    UP, ## Dungeon uses regular floors
+    DOWN, ## Dungeon uses basement floors
 }
 
 ## Portion of FloorGrid's max width/height to actually use for this floor
@@ -49,3 +49,7 @@ enum StairDirection {
 
 ## How many floors this dungeon has
 @export_range(1, 99) var floor_count: int = 10
+
+## Min and max number of mobs to spawn on this floor
+@export_range(0, 100) var mob_count_min: int = 0
+@export_range(0, 100) var mob_count_max: int = 0

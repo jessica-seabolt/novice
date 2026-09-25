@@ -1,5 +1,6 @@
-class_name Player extends Node2D
-## The player's character
+class_name PlayerControl extends Node
+## Lets the player choose their entity's moves from input, including running
+## Must be a direct child of the Entity it controls
 
 ## How long one step takes to slide, in seconds
 const STEP_DURATION: float = 0.15
@@ -9,15 +10,18 @@ const RUN_STEP_DURATION: float = 0.06
 const DIAGONAL_GRACE: float = 0.05
 const MOVE_ACTIONS: Array[StringName] = [&"move_up", &"move_down", &"move_left", &"move_right"]
 
-var grid_position: Vector2i
-
-var _grid: FloorGrid
-var _tilemap_layer: TileMapLayer
-var _step_tween: Tween
 # The direction of the current run, or zero when not running
 var _run_direction: Vector2i = Vector2i.ZERO
 # Set when a run stops, so a direction still held from it doesn't walk on by itself
 var _needs_fresh_press: bool = false
+
+@onready var _entity: Entity = get_parent() as Entity
+
+
+func _ready() -> void:
+    _entity.set_turn(_take_turn)
+    # Arriving on a floor never carries a run or a held key over
+    _entity.placed.connect(_stop_run)
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -28,34 +32,21 @@ func _unhandled_input(event: InputEvent) -> void:
     get_viewport().set_input_as_handled()
 
 
-## Places the player on the floor it will be walking around
-func setup(floor_grid: FloorGrid, tilemap_layer: TileMapLayer, spawn: Vector2i) -> void:
-    if _step_tween != null:
-        _step_tween.kill()
-    _stop_run()
+# Waits for the player to choose a move they're allowed to make, then makes it
+# While running, keeps stepping on its own until RunRules says to stop
+func _take_turn() -> void:
+    await _entity.finish_slide()
 
-    _grid = floor_grid
-    _tilemap_layer = tilemap_layer
-    grid_position = spawn
-    position = _tilemap_layer.map_to_local(spawn)
-
-
-## Waits for the player to choose a move they're allowed to make, then makes it
-## While running, keeps stepping on its own until RunRules says to stop
-func take_turn() -> void:
-    # Let the last step finish sliding before choosing the next
-    if _step_tween != null and _step_tween.is_running():
-        await _step_tween.finished
-
+    var state: FloorState = _entity.floor_state
     if _run_direction != Vector2i.ZERO:
-        if RunRules.should_continue(_grid, grid_position, _run_direction):
+        if RunRules.should_continue(state, _entity.grid_position, _run_direction):
             _step(_run_direction, RUN_STEP_DURATION)
             return
         _stop_run()
 
     while true:
         var direction: Vector2i = await _wait_for_direction()
-        if MoveRules.can_step(_grid, grid_position, direction):
+        if MoveRules.can_step(state, _entity.grid_position, direction):
             # A direction pressed with sprint held starts a run, and that press is its first step
             if Input.is_action_pressed(&"sprint"):
                 _run_direction = direction
@@ -93,12 +84,10 @@ func _wait_for_direction() -> Vector2i:
     return direction
 
 
-# Moves on the grid, then slides the sprite over to match
+# Sets the floor's pace to this step's speed, so everything else slides along with the player
 func _step(direction: Vector2i, duration: float) -> void:
-    grid_position += direction
-    var target: Vector2 = _tilemap_layer.map_to_local(grid_position)
-    _step_tween = create_tween()
-    _step_tween.tween_property(self, "position", target, duration)
+    _entity.floor_state.step_duration = duration
+    _entity.step(direction, duration)
 
 
 func _stop_run() -> void:

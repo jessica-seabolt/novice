@@ -1,11 +1,12 @@
 class_name MoveRules extends RefCounted
-## Decides whether a creature can step from one tile to a neighbouring one
+## Decides whether an entity can step from one tile to a neighbouring one
 
 
 ## Whether something standing on "from" can step one tile in "direction", diagonals included
-static func can_step(grid: FloorGrid, from: Vector2i, direction: Vector2i) -> bool:
+static func can_step(state: FloorState, from: Vector2i, direction: Vector2i) -> bool:
+    var grid: FloorGrid = state.grid
     var to: Vector2i = from + direction
-    if not grid.is_ground(to):
+    if not grid.is_ground(to) or state.occupancy.is_occupied(to):
         return false
 
     # A diagonal step can't cut across the corner of a wall

@@ -4,7 +4,7 @@ class_name SpawnGenerator extends RefCounted
 const NO_TILE: Vector2i = Vector2i(-1, -1)
 
 
-## Places the player and the stairs, each on a reachable tile in a random room
+## Places the player, the stairs and the mobs, each on a reachable tile in a random room
 ## Stairs never go in a doorway
 static func generate(ctx: GenerationContext) -> void:
     ctx.player_spawn = _random_room_tile(ctx, [])
@@ -16,6 +16,18 @@ static func generate(ctx: GenerationContext) -> void:
         push_error("SpawnGenerator found no free tile for the stairs")
         return
     ctx.grid.get_tile(stairs).feature = DungeonTile.Feature.STAIRS
+
+    var mob_count: int = ctx.rng.randi_range(ctx.config.mob_count_min, ctx.config.mob_count_max)
+
+    # Mobs may start on the stairs or in doorways, just never on the player or each other
+    var taken: Array[Vector2i] = [ctx.player_spawn]
+    for _i: int in range(mob_count):
+        var spawn_tile: Vector2i = _random_room_tile(ctx, taken)
+        if spawn_tile == NO_TILE:
+            break
+
+        ctx.mob_spawns.append(spawn_tile)
+        taken.append(spawn_tile)
 
 
 # A random reachable tile in a random room, skipping excluded tiles

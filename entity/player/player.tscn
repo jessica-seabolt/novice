@@ -1,7 +1,8 @@
 [gd_scene format=3 uid="uid://jn4w2opxosxp"]
 
-[ext_resource type="Script" uid="uid://dy3jluem0hnvd" path="res://entity/player/player.gd" id="1_e6ar1"]
-[ext_resource type="Texture2D" uid="uid://2jb32pypqpnd" path="res://graphics/sprites/test_sprite.png" id="2_4pl66"]
+[ext_resource type="Script" uid="uid://dg5llvtgjj0qd" path="res://entity/entity.gd" id="1_entity"]
+[ext_resource type="Script" uid="uid://dy3jluem0hnvd" path="res://entity/player/player_control.gd" id="1_e6ar1"]
+[ext_resource type="Texture2D" uid="uid://2jb32pypqpnd" path="res://graphics/sprites/test_player_sprite.png" id="2_4pl66"]
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_86mg2"]
 animations = [{
@@ -15,10 +16,13 @@ animations = [{
 }]
 
 [node name="Player" type="Node2D" unique_id=1132814981]
-script = ExtResource("1_e6ar1")
+script = ExtResource("1_entity")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=1269501177]
 sprite_frames = SubResource("SpriteFrames_86mg2")
 
 [node name="Camera2D" type="Camera2D" parent="." unique_id=1952857559]
 zoom = Vector2(3, 3)
+
+[node name="PlayerControl" type="Node" parent="." unique_id=1447607903]
+script = ExtResource("1_e6ar1")

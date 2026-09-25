@@ -1,0 +1,26 @@
+[gd_scene format=3 uid="uid://dluvjylmt78d4"]
+
+[ext_resource type="Texture2D" uid="uid://v3ud3ljskmyo" path="res://graphics/sprites/test_mob_sprite.png" id="1_118eo"]
+[ext_resource type="Script" uid="uid://dg5llvtgjj0qd" path="res://entity/entity.gd" id="1_v52id"]
+[ext_resource type="Script" uid="uid://ciq2rmo2kfkk7" path="res://entity/mob/wander_ai.gd" id="3_hcqmy"]
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_86mg2"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("1_118eo")
+}],
+"loop": 1,
+"name": &"default",
+"speed": 5.0
+}]
+
+[node name="Mob" type="Node2D" unique_id=1132814981]
+script = ExtResource("1_v52id")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=1269501177]
+sprite_frames = SubResource("SpriteFrames_86mg2")
+
+[node name="WanderAI" type="Node" parent="." unique_id=278508503]
+script = ExtResource("3_hcqmy")
+metadata/_custom_type_script = "uid://ciq2rmo2kfkk7"

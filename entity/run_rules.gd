@@ -3,11 +3,14 @@ class_name RunRules extends RefCounted
 
 
 ## Whether a run standing on "at" should take another step in "direction"
-static func should_continue(grid: FloorGrid, at: Vector2i, direction: Vector2i) -> bool:
-    if not MoveRules.can_step(grid, at, direction):
+static func should_continue(state: FloorState, at: Vector2i, direction: Vector2i) -> bool:
+    var grid: FloorGrid = state.grid
+    if not MoveRules.can_step(state, at, direction):
         return false
     # Always stops beside stairs, so they can't be run past by accident
     if _near_stairs(grid, at):
+        return false
+    if _next_to_entity(state, at):
         return false
 
     if grid.is_room(at):
@@ -32,6 +35,15 @@ static func _side_passage(grid: FloorGrid, at: Vector2i, direction: Vector2i) ->
             continue
         if not grid.is_ground(beside - direction) or not grid.is_ground(beside + direction):
             return true
+    return false
+
+
+# Temporary: the original games stop a run when a mob comes into view, which needs line of sight
+static func _next_to_entity(state: FloorState, at: Vector2i) -> bool:
+    for y: int in range(-1, 2):
+        for x: int in range(-1, 2):
+            if (x != 0 or y != 0) and state.occupancy.is_occupied(at + Vector2i(x, y)):
+                return true
     return false
 
 

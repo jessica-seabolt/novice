@@ -1,15 +1,18 @@
 class_name TurnSystem extends RefCounted
 ## Decides who acts next, and asks each actor to take its turn
 
+signal actor_acted(actor: Entity)
 
-signal actor_acted(actor: Player)
-
-var _actors: Array[Player] = []
+var _actors: Array[Entity] = []
 var _running: bool = false
 
 
-func add_actor(actor: Player) -> void:
+func add_actor(actor: Entity) -> void:
     _actors.append(actor)
+
+
+func remove_actor(actor: Entity) -> void:
+    _actors.erase(actor)
 
 
 ## Runs turns one actor at a time, until stop() is called
@@ -18,7 +21,7 @@ func run() -> void:
         return
     _running = true
     while _running:
-        for actor: Player in _actors:
+        for actor: Entity in _actors:
             await actor.take_turn()
             actor_acted.emit(actor)
             if not _running:

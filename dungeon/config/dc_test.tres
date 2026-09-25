@@ -10,4 +10,6 @@ extra_hallway_count_max = 10
 dead_end_chance = 0.5
 river_count_min = 1
 river_count_max = 10
+mob_count_min = 3
+mob_count_max = 6
 metadata/_custom_type_script = "uid://ckcnwl4yosetn"
