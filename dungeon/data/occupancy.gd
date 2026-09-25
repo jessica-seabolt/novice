@@ -17,6 +17,10 @@ func place(entity: Entity, p: Vector2i) -> void:
     _entities[p] = entity
 
 
+func remove(p: Vector2i) -> void:
+    _entities.erase(p)
+
+
 func move(entity: Entity, from: Vector2i, to: Vector2i) -> void:
     _entities.erase(from)
     _entities[to] = entity

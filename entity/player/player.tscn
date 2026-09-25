@@ -1,8 +1,10 @@
 [gd_scene format=3 uid="uid://jn4w2opxosxp"]
 
-[ext_resource type="Script" uid="uid://dg5llvtgjj0qd" path="res://entity/entity.gd" id="1_entity"]
 [ext_resource type="Script" uid="uid://dy3jluem0hnvd" path="res://entity/player/player_control.gd" id="1_e6ar1"]
+[ext_resource type="Script" uid="uid://dg5llvtgjj0qd" path="res://entity/entity.gd" id="1_entity"]
 [ext_resource type="Texture2D" uid="uid://2jb32pypqpnd" path="res://graphics/sprites/test_player_sprite.png" id="2_4pl66"]
+[ext_resource type="Script" uid="uid://tq1r1qm7dgmk" path="res://entity/stats/stats.gd" id="4_bgq54"]
+[ext_resource type="Resource" uid="uid://m5te562q5y83" path="res://entity/stats/sb_player.tres" id="5_482rp"]
 [ext_resource type="Script" uid="uid://cs3v3fjlex8ed" path="res://entity/player/aim_overlay.gd" id="6_aim"]
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_86mg2"]
@@ -27,6 +29,10 @@ zoom = Vector2(3, 3)
 
 [node name="PlayerControl" type="Node" parent="." unique_id=1447607903]
 script = ExtResource("1_e6ar1")
+
+[node name="Stats" type="Node" parent="." unique_id=1354903774]
+script = ExtResource("4_bgq54")
+stat_block = ExtResource("5_482rp")
 
 [node name="AimOverlay" type="Node2D" parent="." unique_id=377317734]
 script = ExtResource("6_aim")

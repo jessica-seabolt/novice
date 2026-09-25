@@ -2,6 +2,8 @@ class_name Entity extends Node2D
 ## Anything that stands on a floor and takes turns
 
 signal placed
+signal stepped
+signal turn_taken
 
 var grid_position: Vector2i
 var facing: Vector2i = Vector2i.DOWN
@@ -34,6 +36,7 @@ func set_turn(turn: Callable) -> void:
 
 func take_turn() -> void:
     await _turn.call()
+    turn_taken.emit()
 
 
 ## Moves on the grid at once, then slides the sprite to match
@@ -51,6 +54,7 @@ func step(direction: Vector2i, duration: float) -> void:
     _slide_target = _tilemap_layer.map_to_local(grid_position)
     _step_tween = create_tween()
     _step_tween.tween_property(self, "position", _slide_target, duration)
+    stepped.emit()
 
 
 func face(direction: Vector2i) -> void:

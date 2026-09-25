@@ -21,7 +21,10 @@ func run() -> void:
         return
     _running = true
     while _running:
-        for actor: Entity in _actors:
+        # A copy, since actors can be removed mid-round
+        for actor: Entity in _actors.duplicate():
+            if not _actors.has(actor):
+                continue
             await actor.take_turn()
             actor_acted.emit(actor)
             if not _running:

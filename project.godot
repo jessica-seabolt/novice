@@ -18,6 +18,7 @@ config/icon="res://icon.svg"
 [autoload]
 
 DebugConfig="*uid://didsvceigygvc"
+SignalBus="*uid://bkqyba4sa1y4e"
 
 [display]
 

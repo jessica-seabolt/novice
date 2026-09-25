@@ -26,10 +26,19 @@ NoVice is a top-down roguelike dungeon crawler. Players will travel through dung
 - [x] Stair spawning and floor progression
 - [x] Sprinting
 - [x] Mob Scene and mob spawning
-- [ ] Combat
+- [ ] Stats and damage
+- [ ] Facing and the Basic Spell
+- [ ] Combat feedback
+- [ ] Mob sight and pursuit
+- [ ] Mobs fight back
+- [ ] Spells and targeting
+- [ ] Mana
 - [ ] Items and item spawning
+- [ ] Spell scrolls
+- [ ] Spending stat points
 - [ ] Traps and trap spawning
 - [ ] Dialogue
+- [ ] Allies
 
 ## License
 All Rights Reserved — © 2026 Jessica Seabolt.

@@ -20,6 +20,7 @@ func _ready() -> void:
     config = TEST_CONFIG
     _spawn_player()
     _setup_turn_system()
+    SignalBus.entity_defeated.connect(_on_entity_defeated)
     _start_floor()
 
 
@@ -42,6 +43,19 @@ func _on_actor_acted(actor: Entity) -> void:
     turn_system.stop()
     floor_number += 1
     _start_floor.call_deferred()
+
+
+func _on_entity_defeated(entity: Entity) -> void:
+    if entity == player:
+        # For now, losing restarts the dungeon
+        turn_system.stop()
+        floor_number = 1
+        Stats.of(player).restore()
+        _start_floor.call_deferred()
+        return
+
+    Stats.of(player).stat_points += Stats.of(entity).stat_block.stat_point_reward
+    _remove_mob(entity)
 
 
 func _generate_floor() -> GenerationContext:
@@ -81,11 +95,15 @@ func _spawn_mobs(ctx: GenerationContext) -> void:
 
 
 func _reset_mobs() -> void:
-    for mob: Entity in mobs:
-        turn_system.remove_actor(mob)
-        mob.queue_free()
+    for mob: Entity in mobs.duplicate():
+        _remove_mob(mob)
 
-    mobs.clear()
+
+func _remove_mob(mob: Entity) -> void:
+    turn_system.remove_actor(mob)
+    mob.floor_state.occupancy.remove(mob.grid_position)
+    mobs.erase(mob)
+    mob.queue_free()
 
 
 func _setup_turn_system() -> void:
