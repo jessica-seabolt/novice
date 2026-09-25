@@ -2,7 +2,7 @@
 
 [ext_resource type="Texture2D" uid="uid://v3ud3ljskmyo" path="res://graphics/sprites/test_mob_sprite.png" id="1_118eo"]
 [ext_resource type="Script" uid="uid://dg5llvtgjj0qd" path="res://entity/entity.gd" id="1_v52id"]
-[ext_resource type="Script" uid="uid://ciq2rmo2kfkk7" path="res://entity/mob/wander_ai.gd" id="3_hcqmy"]
+[ext_resource type="Script" uid="uid://ciq2rmo2kfkk7" path="res://entity/mob/mob_ai.gd" id="3_hcqmy"]
 [ext_resource type="Script" uid="uid://tq1r1qm7dgmk" path="res://entity/stats/stats.gd" id="4_hcqmy"]
 [ext_resource type="Resource" uid="uid://bu5ef4n6o1vwp" path="res://entity/stats/sb_test_entity.tres" id="5_aqd3i"]
 [ext_resource type="Script" path="res://entity/damage_flicker.gd" id="7_flicker"]
@@ -25,7 +25,7 @@ display_name = "Mob"
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=1269501177]
 sprite_frames = SubResource("SpriteFrames_86mg2")
 
-[node name="WanderAI" type="Node" parent="." unique_id=278508503]
+[node name="MobAI" type="Node" parent="." unique_id=278508503]
 script = ExtResource("3_hcqmy")
 metadata/_custom_type_script = "uid://ciq2rmo2kfkk7"
 

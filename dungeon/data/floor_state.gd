@@ -10,6 +10,7 @@ var occupancy: Occupancy = Occupancy.new()
 var step_duration: float = 0.15
 ## Shared 8-direction pathfinder
 var pathfinder: AStarGrid2D
+var player: Entity
 
 
 # Walls and water are solid; entities are checked as each step is taken

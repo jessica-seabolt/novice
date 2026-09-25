@@ -33,6 +33,7 @@ func _ready() -> void:
 func _start_floor() -> void:
     var ctx: GenerationContext = _generate_floor()
     floor_state = FloorState.new(ctx.grid, ctx.rooms, ctx.reachable_tiles, ctx.rng)
+    floor_state.player = player
     player.setup(floor_state, floor_layer, ctx.player_spawn)
     _spawn_mobs(ctx)
     turn_system.run()

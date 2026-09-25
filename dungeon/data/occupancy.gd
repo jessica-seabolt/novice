@@ -13,6 +13,12 @@ func get_entity(p: Vector2i) -> Entity:
     return _entities.get(p)
 
 
+func get_entities() -> Array[Entity]:
+    var entities: Array[Entity] = []
+    entities.assign(_entities.values())
+    return entities
+
+
 func place(entity: Entity, p: Vector2i) -> void:
     _entities[p] = entity
 

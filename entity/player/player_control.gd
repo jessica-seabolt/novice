@@ -18,6 +18,8 @@ var _new_neighbours: Array[Entity] = []
 # Set when the stick returns to centre during a run
 var _stick_centred: bool = false
 var _spell_requested: bool = false
+# Entities in view at the start of the last turn
+var _seen: Array[Entity] = []
 
 @onready var _entity: Entity = get_parent() as Entity
 
@@ -49,12 +51,14 @@ func _take_turn() -> void:
     await _entity.finish_slide()
 
     var state: FloorState = _entity.floor_state
+    var sighted: bool = _update_seen(state)
     if _spell_requested:
         _cast_basic_spell()
         return
     if _run_direction != Vector2i.ZERO:
         var keep_running: bool = (
-            not _still_next_to_new_neighbour()
+            not sighted
+            and not _still_next_to_new_neighbour()
             and RunRules.should_continue(state, _entity.grid_position, _run_direction)
         )
         if keep_running:
@@ -134,6 +138,20 @@ func _cast_basic_spell() -> void:
     _entity.floor_state.step_duration = STEP_DURATION
     _entity.hold(STEP_DURATION)
     BasicSpell.cast(_entity)
+
+
+# Whether anything came into view since the last turn
+func _update_seen(state: FloorState) -> bool:
+    var seen: Array[Entity] = []
+    var sighted: bool = false
+    for entity: Entity in state.occupancy.get_entities():
+        var visible: bool = Sight.can_see(state, _entity.grid_position, entity.grid_position)
+        if entity == _entity or not visible:
+            continue
+        seen.append(entity)
+        sighted = sighted or entity not in _seen
+    _seen = seen
+    return sighted
 
 
 # Ones that have since moved away, like a mob being chased, don't stop the run
