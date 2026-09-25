@@ -1,5 +1,5 @@
 class_name MobAI extends Node
-## Wanders between rooms, pursues the player on sight, and searches where it last saw them
+## Wanders, pursues and attacks the player on sight, then searches where they were last seen
 
 enum State {
     WANDER,
@@ -36,6 +36,9 @@ func _take_turn() -> void:
     if state.player != null and Sight.can_see(state, here, state.player.grid_position):
         _state = MobAI.State.PURSUE
         _last_seen = state.player.grid_position
+        if _can_attack(state):
+            await _attack(state)
+            return
         _path = _path_to(state, _last_seen)
     elif _state == MobAI.State.PURSUE:
         _state = MobAI.State.SEARCH
@@ -52,6 +55,24 @@ func _take_turn() -> void:
     if _state == MobAI.State.WANDER and (_path.is_empty() or _in_target_room(state)):
         _plan_wander(state)
     _follow_path(state)
+
+
+# Same rules as the player's cast
+func _can_attack(state: FloorState) -> bool:
+    var direction: Vector2i = state.player.grid_position - _entity.grid_position
+    return (
+        RunRules.is_adjacent(state.player.grid_position, _entity.grid_position)
+        and not MoveRules.cuts_corner(state.grid, _entity.grid_position, direction)
+    )
+
+
+# The turn waits for the attack to play out, so attacks happen one at a time
+func _attack(state: FloorState) -> void:
+    await state.wait_for_slides()
+    _entity.face(state.player.grid_position - _entity.grid_position)
+    _entity.hold(BasicSpell.DURATION)
+    BasicSpell.cast(_entity)
+    await _entity.finish_slide()
 
 
 # Blocked by an entity, it tries a short detour, otherwise waits and replans next turn

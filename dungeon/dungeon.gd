@@ -55,6 +55,8 @@ func _on_entity_defeated(entity: Entity) -> void:
     if entity == player:
         # For now, losing restarts the dungeon
         turn_system.stop()
+        await _vanish(player)
+        await hud.show_log()
         floor_number = 1
         Stats.of(player).restore()
         hud.clear_log()
@@ -66,7 +68,9 @@ func _on_entity_defeated(entity: Entity) -> void:
     if reward > 0:
         var noun: String = "stat point" if reward == 1 else "stat points"
         hud.add_message("%s gained %d %s" % [player.display_name, reward, noun])
-    _remove_mob(entity)
+    _take_off_floor(entity)
+    await _vanish(entity)
+    entity.queue_free()
 
 
 func _generate_floor() -> GenerationContext:
@@ -111,10 +115,21 @@ func _reset_mobs() -> void:
 
 
 func _remove_mob(mob: Entity) -> void:
+    _take_off_floor(mob)
+    mob.queue_free()
+
+
+# Out of play, though still visible while it vanishes
+func _take_off_floor(mob: Entity) -> void:
     turn_system.remove_actor(mob)
     mob.floor_state.occupancy.remove(mob.grid_position)
     mobs.erase(mob)
-    mob.queue_free()
+
+
+func _vanish(entity: Entity) -> void:
+    var flicker: DamageFlicker = DamageFlicker.of(entity)
+    if flicker != null:
+        await flicker.vanish()
 
 
 func _setup_turn_system() -> void:

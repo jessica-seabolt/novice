@@ -53,7 +53,7 @@ func _take_turn() -> void:
     var state: FloorState = _entity.floor_state
     var sighted: bool = _update_seen(state)
     if _spell_requested:
-        _cast_basic_spell()
+        await _cast_basic_spell()
         return
     if _run_direction != Vector2i.ZERO:
         var keep_running: bool = (
@@ -69,7 +69,7 @@ func _take_turn() -> void:
     while true:
         var direction: Vector2i = await _wait_for_direction()
         if _spell_requested:
-            _cast_basic_spell()
+            await _cast_basic_spell()
             return
         # Turning in place is free
         if Input.is_action_pressed(&"aim"):
@@ -135,8 +135,10 @@ func _cast_basic_spell() -> void:
     _spell_requested = false
     if _run_direction != Vector2i.ZERO:
         _stop_run()
-    _entity.floor_state.step_duration = STEP_DURATION
-    _entity.hold(STEP_DURATION)
+    var state: FloorState = _entity.floor_state
+    state.step_duration = STEP_DURATION
+    await state.wait_for_slides()
+    _entity.hold(BasicSpell.DURATION)
     BasicSpell.cast(_entity)
 
 

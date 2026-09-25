@@ -2,6 +2,7 @@ class_name LogWindow extends Control
 ## Every message this run, scrollable, pausing the game while open
 
 signal opened
+signal closed
 
 ## Pixels scrolled per second with the directions
 const SCROLL_SPEED: float = 60.0
@@ -48,12 +49,24 @@ func _process(delta: float) -> void:
 func _unhandled_input(event: InputEvent) -> void:
     if not event.is_action_pressed(&"toggle_log"):
         return
-    visible = not visible
-    get_tree().paused = visible
     get_viewport().set_input_as_handled()
     if visible:
-        opened.emit()
-        _scroll_to_end.call_deferred()
+        close()
+    else:
+        open()
+
+
+func open() -> void:
+    show()
+    get_tree().paused = true
+    opened.emit()
+    _scroll_to_end.call_deferred()
+
+
+func close() -> void:
+    hide()
+    get_tree().paused = false
+    closed.emit()
 
 
 func set_lines(lines: Array[String]) -> void:

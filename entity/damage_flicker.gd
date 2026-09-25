@@ -1,5 +1,5 @@
 class_name DamageFlicker extends Node
-## Blinks the sprite when its entity takes damage
+## Blinks the sprite when its entity takes damage, and blinks it away when defeated
 
 const FLICKERS: int = 4
 ## Seconds hidden, then shown, per flicker
@@ -10,11 +10,35 @@ const INTERVAL: float = 0.05
 var _tween: Tween
 
 
+## Null if the entity doesn't flicker
+static func of(entity: Entity) -> DamageFlicker:
+    return entity.get_node_or_null("DamageFlicker") as DamageFlicker
+
+
 func _ready() -> void:
-    Stats.of(get_parent() as Entity).damaged.connect(_on_damaged)
+    var entity: Entity = get_parent() as Entity
+    Stats.of(entity).damaged.connect(_on_damaged)
+    entity.placed.connect(_on_placed)
+
+
+## Blinks, then leaves the sprite hidden
+func vanish() -> void:
+    _flicker()
+    await _tween.finished
+    sprite.hide()
 
 
 func _on_damaged(_amount: int) -> void:
+    _flicker()
+
+
+func _on_placed() -> void:
+    if _tween != null:
+        _tween.kill()
+    sprite.show()
+
+
+func _flicker() -> void:
     if _tween != null:
         _tween.kill()
     sprite.show()

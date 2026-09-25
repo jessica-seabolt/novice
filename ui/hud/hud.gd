@@ -36,6 +36,12 @@ func add_message(text: String) -> void:
     _popup_timer.start(MESSAGE_DURATION)
 
 
+## Opens the full log and waits until the player closes it
+func show_log() -> void:
+    _log_window.open()
+    await _log_window.closed
+
+
 ## The latest message stays on screen
 func clear_log() -> void:
     _lines.clear()

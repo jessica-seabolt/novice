@@ -5,6 +5,8 @@ signal actor_acted(actor: Entity)
 
 var _actors: Array[Entity] = []
 var _running: bool = false
+# Lets a stale loop notice a newer run has started
+var _generation: int = 0
 
 
 func add_actor(actor: Entity) -> void:
@@ -20,12 +22,17 @@ func run() -> void:
     if _actors.is_empty():
         return
     _running = true
+    _generation += 1
+    var generation: int = _generation
     while _running:
-        # A copy, since actors can be removed mid-round
-        for actor: Entity in _actors.duplicate():
-            if not _actors.has(actor):
+        # A copy, since actors can be removed or freed mid-round
+        for entry: Variant in _actors.duplicate():
+            if not is_instance_valid(entry) or not _actors.has(entry):
                 continue
+            var actor: Entity = entry
             await actor.take_turn()
+            if generation != _generation:
+                return
             actor_acted.emit(actor)
             if not _running:
                 return

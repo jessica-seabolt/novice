@@ -43,3 +43,9 @@ func _init(
     reachable_tiles = floor_reachable_tiles
     rng = floor_rng
     pathfinder = _build_pathfinder(floor_grid)
+
+
+## Waits until no entity is sliding or mid-attack
+func wait_for_slides() -> void:
+    for entity: Entity in occupancy.get_entities():
+        await entity.finish_slide()

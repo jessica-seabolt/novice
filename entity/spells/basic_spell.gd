@@ -2,6 +2,8 @@ class_name BasicSpell extends RefCounted
 ## Free spell that hits the entity the caster is facing
 
 const POWER: int = 1
+## Seconds a cast takes, so attacks play out one at a time
+const DURATION: float = 0.3
 
 
 static func cast(caster: Entity) -> void:
