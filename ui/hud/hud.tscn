@@ -1,0 +1,152 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://ui/hud/hud.gd" id="1_hud"]
+[ext_resource type="PackedScene" path="res://ui/hud/stat_bar.tscn" id="2_bar"]
+[ext_resource type="Texture2D" uid="uid://dy36dhx3ys3ij" path="res://graphics/ui/health_bar.png" id="3_health"]
+[ext_resource type="Texture2D" uid="uid://3uh4v0yatp8m" path="res://graphics/ui/empty_health_bar.png" id="4_health_empty"]
+[ext_resource type="Texture2D" uid="uid://1kam2hluku4o" path="res://graphics/ui/mana_bar.png" id="5_mana"]
+[ext_resource type="Texture2D" uid="uid://jfqbqr4jycja" path="res://graphics/ui/empty_mana_bar.png" id="6_mana_empty"]
+[ext_resource type="Texture2D" uid="uid://dcgdhdxqv7kh4" path="res://graphics/ui/dialogue_box.png" id="7_box"]
+[ext_resource type="Texture2D" uid="uid://dbptn2cpxjqvv" path="res://graphics/ui/dialogue_window.png" id="8_window"]
+[ext_resource type="Script" path="res://ui/hud/log_window.gd" id="9_log"]
+[ext_resource type="Texture2D" uid="uid://j3bx7tgtk11o" path="res://graphics/ui/scroll_tab.png" id="10_tab"]
+[ext_resource type="Script" path="res://ui/scroll_tab.gd" id="11_scroll_tab"]
+
+[node name="Hud" type="CanvasLayer"]
+script = ExtResource("1_hud")
+
+[node name="Bars" type="VBoxContainer" parent="."]
+offset_left = 4.0
+offset_top = 4.0
+offset_right = 124.0
+offset_bottom = 22.0
+theme_override_constants/separation = 2
+
+[node name="Health" parent="Bars" instance=ExtResource("2_bar")]
+layout_mode = 2
+label = "HP"
+full_texture = ExtResource("3_health")
+empty_texture = ExtResource("4_health_empty")
+
+[node name="Mana" parent="Bars" instance=ExtResource("2_bar")]
+layout_mode = 2
+label = "MP"
+full_texture = ExtResource("5_mana")
+empty_texture = ExtResource("6_mana_empty")
+
+[node name="Popup" type="Control" parent="."]
+visible = false
+layout_mode = 3
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 4.0
+offset_top = -28.0
+offset_right = -4.0
+offset_bottom = -4.0
+grow_horizontal = 2
+grow_vertical = 0
+
+[node name="Box" type="NinePatchRect" parent="Popup"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 3.0
+offset_top = 3.0
+offset_right = -3.0
+offset_bottom = -3.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("7_box")
+
+[node name="Frame" type="NinePatchRect" parent="Popup"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("8_window")
+patch_margin_left = 5
+patch_margin_top = 5
+patch_margin_right = 5
+patch_margin_bottom = 5
+
+[node name="Text" type="Label" parent="Popup"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 8.0
+offset_right = -8.0
+grow_horizontal = 2
+grow_vertical = 2
+vertical_alignment = 1
+
+[node name="Timer" type="Timer" parent="Popup"]
+one_shot = true
+
+[node name="LogWindow" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 8.0
+offset_top = 8.0
+offset_right = -8.0
+offset_bottom = -8.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("9_log")
+
+[node name="Box" type="NinePatchRect" parent="LogWindow"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 3.0
+offset_top = 3.0
+offset_right = -3.0
+offset_bottom = -3.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("7_box")
+
+[node name="Frame" type="NinePatchRect" parent="LogWindow"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("8_window")
+patch_margin_left = 5
+patch_margin_top = 5
+patch_margin_right = 5
+patch_margin_bottom = 5
+
+[node name="Scroll" type="ScrollContainer" parent="LogWindow"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 8.0
+offset_top = 8.0
+offset_right = -8.0
+offset_bottom = -8.0
+grow_horizontal = 2
+grow_vertical = 2
+horizontal_scroll_mode = 0
+
+[node name="Text" type="Label" parent="LogWindow/Scroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+autowrap_mode = 3
+
+[node name="Tab" type="TextureRect" parent="LogWindow" node_paths=PackedStringArray("scroll")]
+layout_mode = 0
+texture = ExtResource("10_tab")
+script = ExtResource("11_scroll_tab")
+scroll = NodePath("../Scroll")

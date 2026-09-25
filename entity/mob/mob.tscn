@@ -5,6 +5,7 @@
 [ext_resource type="Script" uid="uid://ciq2rmo2kfkk7" path="res://entity/mob/wander_ai.gd" id="3_hcqmy"]
 [ext_resource type="Script" uid="uid://tq1r1qm7dgmk" path="res://entity/stats/stats.gd" id="4_hcqmy"]
 [ext_resource type="Resource" uid="uid://bu5ef4n6o1vwp" path="res://entity/stats/sb_test_entity.tres" id="5_aqd3i"]
+[ext_resource type="Script" path="res://entity/damage_flicker.gd" id="7_flicker"]
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_86mg2"]
 animations = [{
@@ -19,6 +20,7 @@ animations = [{
 
 [node name="Mob" type="Node2D" unique_id=1132814981]
 script = ExtResource("1_v52id")
+display_name = "Mob"
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=1269501177]
 sprite_frames = SubResource("SpriteFrames_86mg2")
@@ -30,3 +32,7 @@ metadata/_custom_type_script = "uid://ciq2rmo2kfkk7"
 [node name="Stats" type="Node" parent="." unique_id=1070141133]
 script = ExtResource("4_hcqmy")
 stat_block = ExtResource("5_aqd3i")
+
+[node name="DamageFlicker" type="Node" parent="." node_paths=PackedStringArray("sprite") unique_id=107804153]
+script = ExtResource("7_flicker")
+sprite = NodePath("../AnimatedSprite2D")

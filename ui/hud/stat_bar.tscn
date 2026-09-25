@@ -1,0 +1,33 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://ui/hud/stat_bar.gd" id="1_script"]
+[ext_resource type="Texture2D" uid="uid://d3ntb1yuxstan" path="res://graphics/ui/low_bar.png" id="2_low"]
+[ext_resource type="Texture2D" uid="uid://dbvb7takyex2s" path="res://graphics/ui/bar_crack.png" id="3_crack"]
+
+[node name="StatBar" type="HBoxContainer"]
+theme_override_constants/separation = 4
+script = ExtResource("1_script")
+low_texture = ExtResource("2_low")
+
+[node name="Title" type="Label" parent="."]
+layout_mode = 2
+
+[node name="Bar" type="TextureProgressBar" parent="."]
+custom_minimum_size = Vector2(48, 4)
+layout_mode = 2
+size_flags_vertical = 4
+nine_patch_stretch = true
+
+[node name="Crack" type="TextureRect" parent="Bar"]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("3_crack")
+stretch_mode = 1
+
+[node name="Value" type="Label" parent="."]
+layout_mode = 2

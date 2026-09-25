@@ -1,9 +1,10 @@
 class_name Dungeon extends Node2D
 ## Builds each floor and runs its turns
 
-const TEST_CONFIG = preload("res://dungeon/config/dc_test.tres")
+const TEST_CONFIG: DungeonConfig = preload("res://dungeon/config/dc_test.tres")
 const PLAYER_SCENE: PackedScene = preload("res://entity/player/player.tscn")
 const MOB_SCENE: PackedScene = preload("res://entity/mob/mob.tscn")
+const HUD_SCENE: PackedScene = preload("res://ui/hud/hud.tscn")
 
 var config: DungeonConfig
 var floor_state: FloorState
@@ -11,6 +12,7 @@ var player: Entity
 var turn_system: TurnSystem
 var floor_number: int = 1
 var mobs: Array[Entity] = []
+var hud: Hud
 
 @onready var floor_layer: TileMapLayer = $FloorLayer
 @onready var feature_layer: TileMapLayer = $FeatureLayer
@@ -18,7 +20,11 @@ var mobs: Array[Entity] = []
 
 func _ready() -> void:
     config = TEST_CONFIG
+    hud = HUD_SCENE.instantiate()
+    add_child(hud)
+    add_child(DamageNumbers.new())
     _spawn_player()
+    hud.setup(Stats.of(player))
     _setup_turn_system()
     SignalBus.entity_defeated.connect(_on_entity_defeated)
     _start_floor()
@@ -29,7 +35,6 @@ func _start_floor() -> void:
     floor_state = FloorState.new(ctx.grid, ctx.rooms, ctx.reachable_tiles, ctx.rng)
     player.setup(floor_state, floor_layer, ctx.player_spawn)
     _spawn_mobs(ctx)
-    print("Floor ", floor_number)
     turn_system.run()
 
 
@@ -51,10 +56,15 @@ func _on_entity_defeated(entity: Entity) -> void:
         turn_system.stop()
         floor_number = 1
         Stats.of(player).restore()
+        hud.clear_log()
         _start_floor.call_deferred()
         return
 
-    Stats.of(player).stat_points += Stats.of(entity).stat_block.stat_point_reward
+    var reward: int = Stats.of(entity).stat_block.stat_point_reward
+    Stats.of(player).stat_points += reward
+    if reward > 0:
+        var noun: String = "stat point" if reward == 1 else "stat points"
+        hud.add_message("%s gained %d %s" % [player.display_name, reward, noun])
     _remove_mob(entity)
 
 

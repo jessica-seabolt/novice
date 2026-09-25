@@ -81,12 +81,13 @@ func _take_turn() -> void:
             else:
                 _step(direction, STEP_DURATION)
             return
+        _entity.face(direction)
         # Wait a frame so holding into a wall doesn't freeze the game
         await get_tree().process_frame
 
 
 func _wait_for_direction() -> Vector2i:
-    # After a run, the direction must be let go, unless letting go of sprint walks on instead
+    # After a run, the direction or sprint must be let go
     if _needs_fresh_press:
         var sprint_held: bool = Input.is_action_pressed(&"sprint")
         while _held_direction() != Vector2i.ZERO and not Input.is_action_pressed(&"aim"):
@@ -131,6 +132,7 @@ func _cast_basic_spell() -> void:
     if _run_direction != Vector2i.ZERO:
         _stop_run()
     _entity.floor_state.step_duration = STEP_DURATION
+    _entity.hold(STEP_DURATION)
     BasicSpell.cast(_entity)
 
 
@@ -140,12 +142,13 @@ func _stop_run() -> void:
 
 
 func _held_direction() -> Vector2i:
+    if get_tree().paused:
+        return Vector2i.ZERO
     var input: Vector2 = Input.get_vector("move_left", "move_right", "move_up", "move_down")
     return Vector2i(signi(roundi(input.x)), signi(roundi(input.y)))
 
 
-# Only cancels by turning 90 degrees or more from the run
-# or by being let go and pushed again
+# Stick wobble only cancels past 90 degrees, or after recentring
 func _stick_cancels_run() -> bool:
     var held: Vector2i = _held_direction()
     if held == Vector2i.ZERO:

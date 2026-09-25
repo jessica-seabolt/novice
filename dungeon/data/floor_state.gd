@@ -12,19 +12,6 @@ var step_duration: float = 0.15
 var pathfinder: AStarGrid2D
 
 
-func _init(
-    floor_grid: FloorGrid,
-    floor_rooms: Array[DungeonRoom],
-    floor_reachable_tiles: Array[Vector2i],
-    floor_rng: RandomNumberGenerator
-) -> void:
-    grid = floor_grid
-    rooms = floor_rooms
-    reachable_tiles = floor_reachable_tiles
-    rng = floor_rng
-    pathfinder = _build_pathfinder(floor_grid)
-
-
 # Walls and water are solid; entities are checked as each step is taken
 static func _build_pathfinder(floor_grid: FloorGrid) -> AStarGrid2D:
     var astar: AStarGrid2D = AStarGrid2D.new()
@@ -42,3 +29,16 @@ static func _build_pathfinder(floor_grid: FloorGrid) -> AStarGrid2D:
                 astar.set_point_solid(p, true)
 
     return astar
+
+
+func _init(
+    floor_grid: FloorGrid,
+    floor_rooms: Array[DungeonRoom],
+    floor_reachable_tiles: Array[Vector2i],
+    floor_rng: RandomNumberGenerator
+) -> void:
+    grid = floor_grid
+    rooms = floor_rooms
+    reachable_tiles = floor_reachable_tiles
+    rng = floor_rng
+    pathfinder = _build_pathfinder(floor_grid)

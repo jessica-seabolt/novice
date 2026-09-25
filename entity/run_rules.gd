@@ -22,18 +22,6 @@ static func should_continue(state: FloorState, at: Vector2i, direction: Vector2i
     return _is_diagonal(direction) or not _side_passage(grid, at, direction)
 
 
-# Open ground beside the runner with a wall at either end along the run
-static func _side_passage(grid: FloorGrid, at: Vector2i, direction: Vector2i) -> bool:
-    var across: Vector2i = Vector2i(direction.y, direction.x)
-    for side: Vector2i in [across, -across]:
-        var beside: Vector2i = at + side
-        if not grid.is_ground(beside):
-            continue
-        if not grid.is_ground(beside - direction) or not grid.is_ground(beside + direction):
-            return true
-    return false
-
-
 ## Whether stepping from "from" puts the runner next to an entity it wasn't already next to
 ## Temporary until line of sight
 static func steps_into_contact(state: FloorState, from: Vector2i, direction: Vector2i) -> bool:
@@ -45,6 +33,18 @@ static func steps_into_contact(state: FloorState, from: Vector2i, direction: Vec
                 continue
             if absi(p.x - from.x) > 1 or absi(p.y - from.y) > 1:
                 return true
+    return false
+
+
+# Open ground beside the runner with a wall at either end along the run
+static func _side_passage(grid: FloorGrid, at: Vector2i, direction: Vector2i) -> bool:
+    var across: Vector2i = Vector2i(direction.y, direction.x)
+    for side: Vector2i in [across, -across]:
+        var beside: Vector2i = at + side
+        if not grid.is_ground(beside):
+            continue
+        if not grid.is_ground(beside - direction) or not grid.is_ground(beside + direction):
+            return true
     return false
 
 

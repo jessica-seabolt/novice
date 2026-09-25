@@ -5,6 +5,8 @@ signal placed
 signal stepped
 signal turn_taken
 
+@export var display_name: String
+
 var grid_position: Vector2i
 var facing: Vector2i = Vector2i.DOWN
 var floor_state: FloorState
@@ -61,10 +63,19 @@ func face(direction: Vector2i) -> void:
     facing = direction
 
 
-## A tile's area in the same space as the entity's position
+## A tile's area, in the entity's coordinates
 func tile_rect(p: Vector2i) -> Rect2:
     var size: Vector2 = Vector2(_tilemap_layer.tile_set.tile_size)
     return Rect2(_tilemap_layer.map_to_local(p) - size / 2.0, size)
+
+
+## Busy without moving, like while casting
+func hold(duration: float) -> void:
+    if _step_tween != null and _step_tween.is_running():
+        _step_tween.kill()
+        position = _slide_target
+    _step_tween = create_tween()
+    _step_tween.tween_interval(duration)
 
 
 ## Waits for the current slide to end
