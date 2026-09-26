@@ -13,6 +13,7 @@
 [ext_resource type="Script" path="res://ui/hud/prompt.gd" id="12_prompt"]
 [ext_resource type="PackedScene" path="res://ui/menu/selection_menu.tscn" id="13_menu"]
 [ext_resource type="Script" path="res://ui/hud/main_menu.gd" id="14_main_menu"]
+[ext_resource type="Script" path="res://ui/hud/spell_slots.gd" id="15_spell_slots"]
 
 [node name="Hud" type="CanvasLayer"]
 script = ExtResource("1_hud")
@@ -154,3 +155,35 @@ script = ExtResource("14_main_menu")
 log_window = NodePath("../LogWindow")
 
 [node name="Menu" parent="MainMenu" instance=ExtResource("13_menu")]
+
+[node name="SpellMenu" parent="MainMenu" instance=ExtResource("13_menu")]
+
+[node name="SpellSlots" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -4.0
+offset_top = -28.0
+offset_right = -4.0
+offset_bottom = -28.0
+grow_horizontal = 0
+grow_vertical = 0
+mouse_filter = 2
+script = ExtResource("15_spell_slots")
+
+[node name="Frame" parent="SpellSlots" instance=ExtResource("7_frame")]
+layout_mode = 1
+
+[node name="Content" type="MarginContainer" parent="SpellSlots"]
+layout_mode = 0
+mouse_filter = 2
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 7
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 7
+
+[node name="Text" type="Label" parent="SpellSlots/Content"]
+layout_mode = 2

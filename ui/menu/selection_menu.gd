@@ -3,6 +3,7 @@ class_name SelectionMenu extends Control
 
 signal opened
 signal closed
+signal highlighted(index: int)
 signal chosen(index: int)
 signal cancelled
 
@@ -77,6 +78,7 @@ func set_items(texts: Array[String], enabled: Array[bool] = []) -> void:
 func open() -> void:
     show()
     opened.emit()
+    highlighted.emit(_index)
 
 
 func close() -> void:
@@ -89,6 +91,7 @@ func _move(step: int) -> void:
         return
     _index = posmod(_index + step, _enabled.size())
     Sfx.play(NAVIGATE_SOUND)
+    highlighted.emit(_index)
 
 
 func _confirm() -> void:
@@ -103,6 +106,7 @@ func _hover(index: int) -> void:
     if visible and index != _index:
         _index = index
         Sfx.play(NAVIGATE_SOUND)
+        highlighted.emit(_index)
 
 
 func _on_row_input(event: InputEvent, index: int) -> void:

@@ -6,6 +6,7 @@
 [ext_resource type="Script" uid="uid://tq1r1qm7dgmk" path="res://entity/stats/stats.gd" id="4_hcqmy"]
 [ext_resource type="Resource" uid="uid://bu5ef4n6o1vwp" path="res://entity/stats/sb_test_entity.tres" id="5_aqd3i"]
 [ext_resource type="Script" path="res://entity/damage_flicker.gd" id="7_flicker"]
+[ext_resource type="Script" path="res://entity/spells/spellbook.gd" id="spellbook"]
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_86mg2"]
 animations = [{
@@ -36,3 +37,6 @@ stat_block = ExtResource("5_aqd3i")
 [node name="DamageFlicker" type="Node" parent="." node_paths=PackedStringArray("sprite") unique_id=107804153]
 script = ExtResource("7_flicker")
 sprite = NodePath("../AnimatedSprite2D")
+
+[node name="Spellbook" type="Node" parent="."]
+script = ExtResource("spellbook")

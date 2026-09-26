@@ -7,6 +7,7 @@
 [ext_resource type="Resource" uid="uid://m5te562q5y83" path="res://entity/stats/sb_player.tres" id="5_482rp"]
 [ext_resource type="Script" uid="uid://cs3v3fjlex8ed" path="res://entity/player/aim_overlay.gd" id="6_aim"]
 [ext_resource type="Script" uid="uid://ddxd0imvbaxvp" path="res://entity/damage_flicker.gd" id="7_flicker"]
+[ext_resource type="Script" path="res://entity/spells/spellbook.gd" id="spellbook"]
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_86mg2"]
 animations = [{
@@ -22,6 +23,7 @@ animations = [{
 [node name="Player" type="Node2D" unique_id=1132814981]
 script = ExtResource("1_entity")
 display_name = "Player"
+team = 0
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=1269501177]
 sprite_frames = SubResource("SpriteFrames_86mg2")
@@ -41,3 +43,6 @@ script = ExtResource("6_aim")
 [node name="DamageFlicker" type="Node" parent="." unique_id=1072938339 node_paths=PackedStringArray("sprite")]
 script = ExtResource("7_flicker")
 sprite = NodePath("../AnimatedSprite2D")
+
+[node name="Spellbook" type="Node" parent="."]
+script = ExtResource("spellbook")

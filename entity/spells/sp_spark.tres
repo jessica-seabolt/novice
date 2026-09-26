@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="Spell" format=3 uid="uid://bh7m34x213q2n"]
+
+[ext_resource type="Script" uid="uid://b8dxsn2nja4a5" path="res://entity/spells/spell.gd" id="1_spell"]
+
+[resource]
+script = ExtResource("1_spell")
+display_name = "Spark"
+shape = 4
+reach = 4

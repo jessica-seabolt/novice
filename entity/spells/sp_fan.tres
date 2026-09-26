@@ -1,0 +1,8 @@
+[gd_resource type="Resource" script_class="Spell" format=3 uid="uid://csoyrx27we55h"]
+
+[ext_resource type="Script" uid="uid://b8dxsn2nja4a5" path="res://entity/spells/spell.gd" id="1_spell"]
+
+[resource]
+script = ExtResource("1_spell")
+display_name = "Fan"
+shape = 2

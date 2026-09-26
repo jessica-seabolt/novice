@@ -1,5 +1,5 @@
 class_name MobAI extends Node
-## Wanders, pursues and attacks the player on sight, then searches where they were last seen
+## Wanders, pursues and casts at the player on sight, then searches where they were last seen
 
 enum State {
     WANDER,
@@ -12,6 +12,8 @@ const SEARCH_SLACK: int = 5
 ## Extra tiles a detour around a blocking entity may add
 const DETOUR_LIMIT: int = 4
 const NO_ROOM: int = -1
+## Healing is only worth it below this share of max HP
+const HEAL_BELOW: float = 0.5
 
 var _state: MobAI.State = MobAI.State.WANDER
 # Next tile first
@@ -22,6 +24,7 @@ var _last_seen: Vector2i
 var _search_turns_left: int = 0
 
 @onready var _entity: Entity = get_parent() as Entity
+@onready var _spellbook: Spellbook = Spellbook.of(_entity)
 
 
 func _ready() -> void:
@@ -36,8 +39,10 @@ func _take_turn() -> void:
     if state.player != null and Sight.can_see(state, here, state.player.grid_position):
         _state = MobAI.State.PURSUE
         _last_seen = state.player.grid_position
-        if _can_attack(state):
-            await _attack(state)
+        var choices: Array[MobAI.Choice] = _choices(state)
+        if not choices.is_empty():
+            var choice: MobAI.Choice = choices[state.rng.randi_range(0, choices.size() - 1)]
+            await _cast(choice)
             return
         _path = _path_to(state, _last_seen)
     elif _state == MobAI.State.PURSUE:
@@ -57,21 +62,42 @@ func _take_turn() -> void:
     _follow_path(state)
 
 
-# Same rules as the player's cast
-func _can_attack(state: FloorState) -> bool:
-    var direction: Vector2i = state.player.grid_position - _entity.grid_position
-    return (
-        RunRules.is_adjacent(state.player.grid_position, _entity.grid_position)
-        and not MoveRules.cuts_corner(state.grid, _entity.grid_position, direction)
-    )
+# Each spell that would do something from here, with the way to face for it
+func _choices(state: FloorState) -> Array[MobAI.Choice]:
+    var spells: Array[Spell] = [Spellbook.BASIC]
+    spells.append_array(_spellbook.spells)
+    var result: Array[MobAI.Choice] = []
+    for spell: Spell in spells:
+        for direction: Vector2i in _directions_to_try(state, spell):
+            if _is_worth_casting(state, spell, direction):
+                result.append(MobAI.Choice.new(spell, direction))
+                break
+    return result
 
 
-# The turn waits for the attack to play out, so attacks happen one at a time
-func _attack(state: FloorState) -> void:
-    await state.wait_for_slides()
-    _entity.face(state.player.grid_position - _entity.grid_position)
-    _entity.hold(BasicSpell.DURATION)
-    BasicSpell.cast(_entity)
+# Straight at the player first, so a spread centres on them
+func _directions_to_try(state: FloorState, spell: Spell) -> Array[Vector2i]:
+    var directions: Array[Vector2i] = [_entity.facing]
+    if not spell.is_aimed():
+        return directions
+    var offset: Vector2i = state.player.grid_position - _entity.grid_position
+    directions[0] = Vector2i(signi(offset.x), signi(offset.y))
+    directions.append_array(SpellArea.DIRECTIONS)
+    return directions
+
+
+func _is_worth_casting(state: FloorState, spell: Spell, direction: Vector2i) -> bool:
+    var targets: Array[Entity] = SpellArea.targets(spell, _entity, direction)
+    if spell.effect == Spell.Effect.DAMAGE:
+        return state.player in targets
+    var stats: Stats = Stats.of(_entity)
+    return _entity in targets and stats.hp < stats.stat_block.max_hp * HEAL_BELOW
+
+
+# The turn waits for the cast to play out, so casts happen one at a time
+func _cast(choice: MobAI.Choice) -> void:
+    _entity.face(choice.direction)
+    await _spellbook.cast(choice.spell)
     await _entity.finish_slide()
 
 
@@ -149,3 +175,12 @@ func _reset() -> void:
     _state = MobAI.State.WANDER
     _path.clear()
     _target_room = NO_ROOM
+
+
+class Choice:
+    var spell: Spell
+    var direction: Vector2i
+
+    func _init(chosen_spell: Spell, chosen_direction: Vector2i) -> void:
+        spell = chosen_spell
+        direction = chosen_direction

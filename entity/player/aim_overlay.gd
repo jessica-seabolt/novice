@@ -1,14 +1,22 @@
 class_name AimOverlay extends Node2D
-## While aim is held, shows the grid and the line of tiles the player is facing
+## While aim is held, shows the grid and the line of tiles the player is facing;
+## from a menu, shows the area a spell would cover
 
 const GRID_COLOR: Color = Color(1.0, 1.0, 1.0, 0.15)
 const LINE_COLOR: Color = Color(1.0, 1.0, 1.0, 0.5)
+const AREA_COLOR: Color = Color(1.0, 1.0, 1.0, 0.3)
 
 # What was last drawn, so it only redraws when something changes
 var _drawn_position: Vector2i
 var _drawn_facing: Vector2i
+var _previewed: Spell
 
 @onready var _entity: Entity = get_parent() as Entity
+
+
+## Null if the entity has no overlay
+static func of(entity: Entity) -> AimOverlay:
+    return entity.get_node_or_null("AimOverlay") as AimOverlay
 
 
 func _ready() -> void:
@@ -19,6 +27,8 @@ func _ready() -> void:
 
 
 func _process(_delta: float) -> void:
+    if _previewed != null:
+        return
     var aiming: bool = _entity.floor_state != null and Input.is_action_pressed(&"aim")
     var changed: bool = (
         _entity.grid_position != _drawn_position or _entity.facing != _drawn_facing
@@ -28,6 +38,13 @@ func _process(_delta: float) -> void:
         _drawn_facing = _entity.facing
         queue_redraw()
     visible = aiming
+
+
+## Shows the area a spell would cover instead, until given null
+func preview(spell: Spell) -> void:
+    _previewed = spell
+    visible = spell != null
+    queue_redraw()
 
 
 func _draw() -> void:
@@ -47,6 +64,15 @@ func _draw() -> void:
         lines.append(Vector2(origin.x, line_y))
         lines.append(Vector2(far.x, line_y))
     draw_multiline(lines, GRID_COLOR, 1.0)
+
+    if _previewed != null:
+        var state: FloorState = _entity.floor_state
+        var area: Array[Vector2i] = SpellArea.tiles(
+            _previewed, state, _entity.grid_position, _entity.facing
+        )
+        for p: Vector2i in area:
+            draw_rect(_entity.tile_rect(p), AREA_COLOR)
+        return
 
     var p: Vector2i = _entity.grid_position + _entity.facing
     while grid.is_in_bounds(p) and not grid.is_wall(p):

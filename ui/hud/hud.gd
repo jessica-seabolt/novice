@@ -15,21 +15,27 @@ var _open_windows: int = 0
 @onready var _popup_timer: Timer = $Popup/Timer
 @onready var _log_window: LogWindow = $LogWindow
 @onready var _prompt: Prompt = $Prompt
+@onready var _main_menu: MainMenu = $MainMenu
+@onready var _spell_slots: SpellSlots = $SpellSlots
 
 
 func _ready() -> void:
     SignalBus.entity_damaged.connect(_on_entity_damaged)
     SignalBus.entity_defeated.connect(_on_entity_defeated)
+    SignalBus.entity_healed.connect(_on_entity_healed)
+    SignalBus.spell_cast.connect(_on_spell_cast)
     _popup_timer.timeout.connect(_popup.hide)
-    for window: Node in [_log_window, $Prompt/Menu, $MainMenu/Menu]:
+    for window: Node in [_log_window, $Prompt/Menu, $MainMenu/Menu, $MainMenu/SpellMenu]:
         window.opened.connect(_on_window_opened)
         window.closed.connect(_on_window_closed)
 
 
-func setup(stats: Stats) -> void:
-    _stats = stats
+func setup(player: Entity) -> void:
+    _stats = Stats.of(player)
     _stats.changed.connect(_refresh)
     _refresh()
+    _main_menu.setup(player)
+    _spell_slots.setup(Spellbook.of(player))
 
 
 func add_message(text: String) -> void:
@@ -80,3 +86,12 @@ func _on_entity_damaged(entity: Entity, amount: int) -> void:
 
 func _on_entity_defeated(entity: Entity) -> void:
     add_message("%s was defeated" % entity.display_name)
+
+
+func _on_entity_healed(entity: Entity, amount: int) -> void:
+    add_message("%s recovered %d HP" % [entity.display_name, amount])
+
+
+func _on_spell_cast(caster: Entity, spell: Spell, _tiles: Array[Vector2i]) -> void:
+    if spell != Spellbook.BASIC: # Too common to be worth a message
+        add_message("%s cast %s" % [caster.display_name, spell.display_name])

@@ -8,6 +8,8 @@ const RUN_STEP_DURATION: float = 0.03
 ## Seconds to wait for a second key to make a diagonal
 const DIAGONAL_GRACE: float = 0.05
 const MOVE_ACTIONS: Array[StringName] = [&"move_up", &"move_down", &"move_left", &"move_right"]
+## One per known spell
+const SLOT_ACTIONS: Array[StringName] = [&"spell_1", &"spell_2", &"spell_3", &"spell_4"]
 
 # Zero when not running
 var _run_direction: Vector2i = Vector2i.ZERO
@@ -17,22 +19,25 @@ var _needs_fresh_press: bool = false
 var _new_neighbours: Array[Entity] = []
 # Set when the stick returns to centre during a run
 var _stick_centred: bool = false
-var _spell_requested: bool = false
+var _requested_spell: Spell
 # Entities in view at the start of the last turn
 var _seen: Array[Entity] = []
 
 @onready var _entity: Entity = get_parent() as Entity
+@onready var _spellbook: Spellbook = Spellbook.of(_entity)
 
 
 func _ready() -> void:
     _entity.set_turn(_take_turn)
     # New floors never carry a run over
     _entity.placed.connect(_stop_run)
+    _spellbook.requested.connect(_request_spell)
 
 
 func _unhandled_input(event: InputEvent) -> void:
-    if event.is_action_pressed(&"basic_spell"):
-        _spell_requested = true
+    var spell: Spell = _spell_for(event)
+    if spell != null:
+        _request_spell(spell)
         get_viewport().set_input_as_handled()
         return
     # A fresh direction press cancels a run
@@ -52,8 +57,8 @@ func _take_turn() -> void:
 
     var state: FloorState = _entity.floor_state
     var sighted: bool = _update_seen(state)
-    if _spell_requested:
-        await _cast_basic_spell()
+    if _requested_spell != null:
+        await _cast(_requested_spell)
         return
     if _run_direction != Vector2i.ZERO:
         var keep_running: bool = (
@@ -68,8 +73,8 @@ func _take_turn() -> void:
 
     while true:
         var direction: Vector2i = await _wait_for_direction()
-        if _spell_requested:
-            await _cast_basic_spell()
+        if _requested_spell != null:
+            await _cast(_requested_spell)
             return
         # Turning in place is free
         if Input.is_action_pressed(&"aim"):
@@ -98,7 +103,7 @@ func _wait_for_direction() -> Vector2i:
             if sprint_held and not Input.is_action_pressed(&"sprint"):
                 break
             sprint_held = Input.is_action_pressed(&"sprint")
-            if _spell_requested:
+            if _requested_spell != null:
                 return Vector2i.ZERO
             await get_tree().process_frame
         _needs_fresh_press = false
@@ -108,7 +113,7 @@ func _wait_for_direction() -> Vector2i:
         return direction # Held from the last step
 
     while direction == Vector2i.ZERO:
-        if _spell_requested:
+        if _requested_spell != null:
             return Vector2i.ZERO
         await get_tree().process_frame
         direction = _held_direction()
@@ -131,15 +136,16 @@ func _step(direction: Vector2i, duration: float) -> void:
     _entity.step(direction, duration)
 
 
-func _cast_basic_spell() -> void:
-    _spell_requested = false
+func _request_spell(spell: Spell) -> void:
+    _requested_spell = spell
+
+
+func _cast(spell: Spell) -> void:
+    _requested_spell = null
     if _run_direction != Vector2i.ZERO:
         _stop_run()
-    var state: FloorState = _entity.floor_state
-    state.step_duration = STEP_DURATION
-    await state.wait_for_slides()
-    _entity.hold(BasicSpell.DURATION)
-    BasicSpell.cast(_entity)
+    _entity.floor_state.step_duration = STEP_DURATION
+    await _spellbook.cast(spell)
 
 
 # Whether anything came into view since the last turn
@@ -184,6 +190,19 @@ func _stick_cancels_run() -> bool:
         _stick_centred = true
         return false
     return _stick_centred or held.x * _run_direction.x + held.y * _run_direction.y <= 0
+
+
+# Null if the event isn't a cast; slots on a controller need the modifier held
+func _spell_for(event: InputEvent) -> Spell:
+    if event.is_action_pressed(&"basic_spell"):
+        return Spellbook.BASIC
+    for i: int in range(SLOT_ACTIONS.size()):
+        if not event.is_action_pressed(SLOT_ACTIONS[i]):
+            continue
+        if event is InputEventJoypadButton and not Input.is_action_pressed(&"spell_modifier"):
+            return null
+        return _spellbook.spells[i] if i < _spellbook.spells.size() else null
+    return null
 
 
 func _is_direction_press(event: InputEvent) -> bool:

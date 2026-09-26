@@ -5,7 +5,13 @@ signal placed
 signal stepped
 signal turn_taken
 
+enum Team {
+    PLAYER,
+    MOBS,
+}
+
 @export var display_name: String
+@export var team: Entity.Team = Entity.Team.MOBS
 
 var grid_position: Vector2i
 var facing: Vector2i = Vector2i.DOWN
@@ -61,6 +67,10 @@ func step(direction: Vector2i, duration: float) -> void:
 
 func face(direction: Vector2i) -> void:
     facing = direction
+
+
+func is_foe(other: Entity) -> bool:
+    return other.team != team
 
 
 ## A tile's area, in the entity's coordinates
