@@ -7,6 +7,7 @@ const HEAL_COLOR: Color = Color(0.5, 1.0, 0.6, 0.5)
 
 func _ready() -> void:
     z_index = 1
+    process_mode = Node.PROCESS_MODE_ALWAYS
     SignalBus.spell_cast.connect(_on_spell_cast)
 
 

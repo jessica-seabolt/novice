@@ -1,5 +1,5 @@
 extends Node
-## Plays one-shot sound effects, including while the game is paused
+## Plays sound effects
 
 const PLAYERS: int = 4
 
@@ -15,7 +15,7 @@ func _ready() -> void:
         _players.append(player)
 
 
-## Quick sounds overlap rather than cut each other off
+## Quick sounds overlap
 func play(stream: AudioStream) -> void:
     var player: AudioStreamPlayer = _players[_next]
     _next = (_next + 1) % PLAYERS

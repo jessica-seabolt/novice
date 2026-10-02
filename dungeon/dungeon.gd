@@ -44,7 +44,8 @@ func _start_floor() -> void:
     turn_system.run()
 
 
-func _between_turns(actor: Entity) -> void:
+# Asked once the round comes back to the player, so mobs get to act first
+func _before_turn(actor: Entity) -> void:
     if actor != player:
         return
     var arrived: bool = player.grid_position != _player_last_position
@@ -55,7 +56,7 @@ func _between_turns(actor: Entity) -> void:
         return
     if floor_number >= config.floor_count:
         return # The last floor's stairs lead nowhere yet
-    await player.finish_slide()
+    await floor_state.wait_for_slides()
     if await hud.ask("Proceed to the next floor?", ["Yes", "No"]) != 0:
         return
     turn_system.stop()
@@ -147,4 +148,4 @@ func _vanish(entity: Entity) -> void:
 func _setup_turn_system() -> void:
     turn_system = TurnSystem.new()
     turn_system.add_actor(player)
-    turn_system.between_turns = _between_turns
+    turn_system.before_turn = _before_turn

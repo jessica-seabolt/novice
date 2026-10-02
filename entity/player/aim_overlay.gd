@@ -12,6 +12,7 @@ var _drawn_facing: Vector2i
 var _previewed: Spell
 
 @onready var _entity: Entity = get_parent() as Entity
+@onready var _player_control: PlayerControl = PlayerControl.of(_entity)
 
 
 ## Null if the entity has no overlay
@@ -29,7 +30,11 @@ func _ready() -> void:
 func _process(_delta: float) -> void:
     if _previewed != null:
         return
-    var aiming: bool = _entity.floor_state != null and Input.is_action_pressed(&"aim")
+    var aiming: bool = (
+        _entity.floor_state != null
+        and _player_control.is_awaiting_input()
+        and Input.is_action_pressed(&"aim")
+    )
     var changed: bool = (
         _entity.grid_position != _drawn_position or _entity.facing != _drawn_facing
     )

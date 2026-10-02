@@ -46,17 +46,12 @@ func _process(delta: float) -> void:
     _scroll_container.scroll_vertical = roundi(_scroll)
 
 
+# Opening is up to the main menu, which knows when it's the player's turn
 func _unhandled_input(event: InputEvent) -> void:
-    if not event.is_action_pressed(&"toggle_log"):
-        return
-    # Only opens during play, so another window can use the same button
-    if not visible and get_tree().paused:
+    if not visible or not event.is_action_pressed(&"toggle_log"):
         return
     get_viewport().set_input_as_handled()
-    if visible:
-        close()
-    else:
-        open()
+    close()
 
 
 func open() -> void:

@@ -5,3 +5,4 @@
 [resource]
 script = ExtResource("1_spell")
 display_name = "Basic Spell"
+cost = 0

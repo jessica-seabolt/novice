@@ -7,6 +7,7 @@
 [resource]
 script = ExtResource("1_ie8jf")
 max_hp = 10
+max_mana = 3
 stat_point_reward = 1
 spells = Array[ExtResource("spell")]([ExtResource("sp_spark")])
 metadata/_custom_type_script = "uid://djf0j5cmysu4l"

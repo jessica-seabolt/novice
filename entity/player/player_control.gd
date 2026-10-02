@@ -20,11 +20,18 @@ var _new_neighbours: Array[Entity] = []
 # Set when the stick returns to centre during a run
 var _stick_centred: bool = false
 var _requested_spell: Spell
+# Only true while its turn waits on the player; other input is ignored
+var _awaiting_input: bool = false
 # Entities in view at the start of the last turn
 var _seen: Array[Entity] = []
 
 @onready var _entity: Entity = get_parent() as Entity
 @onready var _spellbook: Spellbook = Spellbook.of(_entity)
+
+
+## Null if the entity isn't player-controlled
+static func of(entity: Entity) -> PlayerControl:
+    return entity.get_node_or_null("PlayerControl") as PlayerControl
 
 
 func _ready() -> void:
@@ -37,10 +44,11 @@ func _ready() -> void:
 func _unhandled_input(event: InputEvent) -> void:
     var spell: Spell = _spell_for(event)
     if spell != null:
-        _request_spell(spell)
+        if _awaiting_input:
+            _spellbook.request(spell)
         get_viewport().set_input_as_handled()
         return
-    # A fresh direction press cancels a run
+    # A fresh direction press cancels a run, even between turns
     if _run_direction == Vector2i.ZERO:
         return
     if event is InputEventJoypadMotion:
@@ -52,14 +60,15 @@ func _unhandled_input(event: InputEvent) -> void:
     get_viewport().set_input_as_handled()
 
 
+func is_awaiting_input() -> bool:
+    return _awaiting_input
+
+
 func _take_turn() -> void:
     await _entity.finish_slide()
 
     var state: FloorState = _entity.floor_state
     var sighted: bool = _update_seen(state)
-    if _requested_spell != null:
-        await _cast(_requested_spell)
-        return
     if _run_direction != Vector2i.ZERO:
         var keep_running: bool = (
             not sighted
@@ -71,6 +80,12 @@ func _take_turn() -> void:
             return
         _stop_run()
 
+    _awaiting_input = true
+    await _act_on_input(state)
+    _awaiting_input = false
+
+
+func _act_on_input(state: FloorState) -> void:
     while true:
         var direction: Vector2i = await _wait_for_direction()
         if _requested_spell != null:

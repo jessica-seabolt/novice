@@ -3,7 +3,7 @@ class_name Spellbook extends Node
 
 signal requested(spell: Spell)
 
-## Known by everyone, and free
+## Known by everyone
 const BASIC: Spell = preload("res://entity/spells/sp_basic.tres")
 
 var spells: Array[Spell] = []
@@ -21,8 +21,15 @@ func _ready() -> void:
     spells.assign(Stats.of(_entity).stat_block.spells)
 
 
-## For whoever controls the entity
+func can_cast(spell: Spell) -> bool:
+    return Stats.of(_entity).mana >= spell.cost
+
+
+## Refused without enough mana
 func request(spell: Spell) -> void:
+    if not can_cast(spell):
+        SignalBus.cast_refused.emit(_entity, spell)
+        return
     requested.emit(spell)
 
 
@@ -31,6 +38,7 @@ func cast(spell: Spell) -> void:
     var state: FloorState = _entity.floor_state
     await state.wait_for_slides()
     _entity.hold(Spell.DURATION)
+    Stats.of(_entity).spend_mana(spell.cost)
     var here: Vector2i = _entity.grid_position
     var tiles: Array[Vector2i] = SpellArea.tiles(spell, state, here, _entity.facing)
     var targets: Array[Entity] = SpellArea.targets(spell, _entity, _entity.facing)

@@ -4,9 +4,10 @@ class_name SpellSlots extends Control
 const BUTTONS: Array[String] = ["A", "B", "X", "Y"]
 
 var _spellbook: Spellbook
+var _player_control: PlayerControl
 
 @onready var _content: MarginContainer = $Content
-@onready var _text: Label = $Content/Text
+@onready var _rows: VBoxContainer = $Content/Rows
 
 
 func _ready() -> void:
@@ -18,15 +19,22 @@ func _process(_delta: float) -> void:
         _spellbook != null
         and not _spellbook.spells.is_empty()
         and not get_tree().paused
+        and _player_control.is_awaiting_input()
         and Input.is_action_pressed(&"spell_modifier")
     )
+    if not visible:
+        return
+    for i: int in range(_rows.get_child_count()):
+        var affordable: bool = _spellbook.can_cast(_spellbook.spells[i])
+        _rows.get_child(i).modulate = Color.WHITE if affordable else SelectionMenu.DISABLED_COLOR
 
 
-func setup(spellbook: Spellbook) -> void:
-    _spellbook = spellbook
-    var lines: Array[String] = []
+func setup(player: Entity) -> void:
+    _spellbook = Spellbook.of(player)
+    _player_control = PlayerControl.of(player)
     for i: int in range(mini(_spellbook.spells.size(), BUTTONS.size())):
-        lines.append("%s  %s" % [BUTTONS[i], _spellbook.spells[i].display_name])
-    _text.text = "\n".join(lines)
+        var row: Label = Label.new()
+        row.text = "%s  %s" % [BUTTONS[i], _spellbook.spells[i].display_name]
+        _rows.add_child(row)
     # Grows up and left from its corner
     custom_minimum_size = _content.get_combined_minimum_size()

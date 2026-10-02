@@ -1,5 +1,6 @@
 class_name MainMenu extends Node
-## The menu opened during play, leading to spells, items, stats and the log
+## The menu opened on the player's turn, leading to spells, items, stats and the log;
+## also opens the log directly
 
 enum Option {
     SPELLS,
@@ -16,6 +17,7 @@ const OPEN_SOUND: AudioStream = preload("res://audio/sfx/sfx_menu_select.ogg")
 @export var log_window: LogWindow
 
 var _spellbook: Spellbook
+var _player_control: PlayerControl
 var _aim_overlay: AimOverlay
 
 @onready var _menu: SelectionMenu = $Menu
@@ -32,15 +34,21 @@ func _ready() -> void:
 
 
 func _unhandled_input(event: InputEvent) -> void:
-    if _menu.visible or get_tree().paused or not event.is_action_pressed(&"open_menu"):
+    if get_tree().paused or not _player_control.is_awaiting_input():
+        return
+    if event.is_action_pressed(&"open_menu"):
+        Sfx.play(OPEN_SOUND)
+        _open(_menu)
+    elif event.is_action_pressed(&"toggle_log"):
+        log_window.open()
+    else:
         return
     get_viewport().set_input_as_handled()
-    Sfx.play(OPEN_SOUND)
-    _open(_menu)
 
 
 func setup(player: Entity) -> void:
     _spellbook = Spellbook.of(player)
+    _player_control = PlayerControl.of(player)
     _aim_overlay = AimOverlay.of(player)
     var names: Array[String] = []
     for spell: Spell in _spellbook.spells:
@@ -61,6 +69,10 @@ func _open(menu: SelectionMenu) -> void:
 func _on_chosen(index: int) -> void:
     match index:
         MainMenu.Option.SPELLS:
+            var affordable: Array[bool] = []
+            for spell: Spell in _spellbook.spells:
+                affordable.append(_spellbook.can_cast(spell))
+            _spell_menu.set_enabled(affordable)
             _menu.close()
             _open(_spell_menu)
         MainMenu.Option.LOG:

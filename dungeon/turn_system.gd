@@ -1,8 +1,8 @@
 class_name TurnSystem extends RefCounted
 ## Decides who acts next, and asks each actor to take its turn
 
-## Awaited after each actor's turn, before the next one goes
-var between_turns: Callable
+## Awaited before each actor's turn
+var before_turn: Callable
 
 var _actors: Array[Entity] = []
 var _running: bool = false
@@ -31,12 +31,12 @@ func run() -> void:
             if not is_instance_valid(entry) or not _actors.has(entry):
                 continue
             var actor: Entity = entry
+            if before_turn.is_valid():
+                await before_turn.call(actor)
+            if generation != _generation or not _running:
+                return
             await actor.take_turn()
             if generation != _generation:
-                return
-            if between_turns.is_valid():
-                await between_turns.call(actor)
-            if generation != _generation or not _running:
                 return
 
 

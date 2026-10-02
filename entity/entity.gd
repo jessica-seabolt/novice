@@ -60,7 +60,7 @@ func step(direction: Vector2i, duration: float) -> void:
         position = _slide_target
 
     _slide_target = _tilemap_layer.map_to_local(grid_position)
-    _step_tween = create_tween()
+    _step_tween = _create_step_tween()
     _step_tween.tween_property(self, "position", _slide_target, duration)
     stepped.emit()
 
@@ -84,7 +84,7 @@ func hold(duration: float) -> void:
     if _step_tween != null and _step_tween.is_running():
         _step_tween.kill()
         position = _slide_target
-    _step_tween = create_tween()
+    _step_tween = _create_step_tween()
     _step_tween.tween_interval(duration)
 
 
@@ -92,3 +92,8 @@ func hold(duration: float) -> void:
 func finish_slide() -> void:
     if _step_tween != null and _step_tween.is_running():
         await _step_tween.finished
+
+
+# Keeps playing while a window has the game paused
+func _create_step_tween() -> Tween:
+    return create_tween().set_pause_mode(Tween.TWEEN_PAUSE_PROCESS)

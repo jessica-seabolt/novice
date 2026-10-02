@@ -24,6 +24,7 @@ func _ready() -> void:
     SignalBus.entity_defeated.connect(_on_entity_defeated)
     SignalBus.entity_healed.connect(_on_entity_healed)
     SignalBus.spell_cast.connect(_on_spell_cast)
+    SignalBus.cast_refused.connect(_on_cast_refused)
     _popup_timer.timeout.connect(_popup.hide)
     for window: Node in [_log_window, $Prompt/Menu, $MainMenu/Menu, $MainMenu/SpellMenu]:
         window.opened.connect(_on_window_opened)
@@ -35,7 +36,7 @@ func setup(player: Entity) -> void:
     _stats.changed.connect(_refresh)
     _refresh()
     _main_menu.setup(player)
-    _spell_slots.setup(Spellbook.of(player))
+    _spell_slots.setup(player)
 
 
 func add_message(text: String) -> void:
@@ -95,3 +96,8 @@ func _on_entity_healed(entity: Entity, amount: int) -> void:
 func _on_spell_cast(caster: Entity, spell: Spell, _tiles: Array[Vector2i]) -> void:
     if spell != Spellbook.BASIC: # Too common to be worth a message
         add_message("%s cast %s" % [caster.display_name, spell.display_name])
+
+
+func _on_cast_refused(_caster: Entity, _spell: Spell) -> void:
+    Sfx.play(SelectionMenu.BAD_SOUND)
+    add_message("Not enough MP")

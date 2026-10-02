@@ -16,6 +16,7 @@ var _heal_settings: LabelSettings = LabelSettings.new()
 
 func _ready() -> void:
     z_index = 10
+    process_mode = Node.PROCESS_MODE_ALWAYS
     for settings: LabelSettings in [_damage_settings, _heal_settings]:
         settings.font = FONT
         settings.font_size = FONT_SIZE

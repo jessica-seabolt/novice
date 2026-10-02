@@ -68,6 +68,8 @@ func _choices(state: FloorState) -> Array[MobAI.Choice]:
     spells.append_array(_spellbook.spells)
     var result: Array[MobAI.Choice] = []
     for spell: Spell in spells:
+        if not _spellbook.can_cast(spell):
+            continue
         for direction: Vector2i in _directions_to_try(state, spell):
             if _is_worth_casting(state, spell, direction):
                 result.append(MobAI.Choice.new(spell, direction))

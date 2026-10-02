@@ -59,19 +59,29 @@ func set_items(texts: Array[String], enabled: Array[bool] = []) -> void:
     _enabled.clear()
 
     for i: int in range(texts.size()):
-        var available: bool = enabled.is_empty() or enabled[i]
         var row: Label = Label.new()
         row.text = texts[i]
         row.mouse_filter = Control.MOUSE_FILTER_STOP
-        if not available:
-            row.add_theme_color_override(&"font_color", DISABLED_COLOR)
         row.mouse_entered.connect(_hover.bind(i))
         row.gui_input.connect(_on_row_input.bind(i))
         _rows.add_child(row)
-        _enabled.append(available)
+        _enabled.append(true)
+    if not enabled.is_empty():
+        set_enabled(enabled)
 
     _index = maxi(0, _enabled.find(true))
     size = _content.get_combined_minimum_size()
+
+
+## Keeps the cursor where it was
+func set_enabled(enabled: Array[bool]) -> void:
+    _enabled = enabled.duplicate()
+    for i: int in range(_rows.get_child_count()):
+        var row: Label = _rows.get_child(i) as Label
+        if _enabled[i]:
+            row.remove_theme_color_override(&"font_color")
+        else:
+            row.add_theme_color_override(&"font_color", DISABLED_COLOR)
 
 
 ## Keeps the cursor where it was

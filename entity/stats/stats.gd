@@ -51,6 +51,11 @@ func heal(amount: int) -> void:
     SignalBus.entity_healed.emit(_entity, healed)
 
 
+func spend_mana(amount: int) -> void:
+    mana = maxi(0, mana - amount)
+    changed.emit()
+
+
 func restore() -> void:
     hp = stat_block.max_hp
     mana = stat_block.max_mana

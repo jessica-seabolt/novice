@@ -23,6 +23,7 @@ const DURATION: float = 0.3
 @export var effect: Spell.Effect = Spell.Effect.DAMAGE
 ## Dice rolled
 @export_range(1, 10) var power: int = 1
+@export_range(0, 100) var cost: int = 1
 ## Tiles a line travels
 @export_range(1, 20) var reach: int = 1
 

@@ -42,7 +42,7 @@ func _flicker() -> void:
     if _tween != null:
         _tween.kill()
     sprite.show()
-    _tween = create_tween().set_loops(FLICKERS)
+    _tween = create_tween().set_loops(FLICKERS).set_pause_mode(Tween.TWEEN_PAUSE_PROCESS)
     _tween.tween_callback(sprite.hide)
     _tween.tween_interval(INTERVAL)
     _tween.tween_callback(sprite.show)
