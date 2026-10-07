@@ -1,8 +1,14 @@
 [gd_resource type="Resource" script_class="Spell" format=3 uid="uid://csoyrx27we55h"]
 
 [ext_resource type="Script" uid="uid://b8dxsn2nja4a5" path="res://entity/spells/spell.gd" id="1_spell"]
+[ext_resource type="Script" uid="uid://cn2i15qnrmbbk" path="res://effect/damage_effect.gd" id="damage"]
+[ext_resource type="Script" uid="uid://ebha4j45jol4" path="res://effect/effect.gd" id="effect"]
+
+[sub_resource type="Resource" id="Resource_effect"]
+script = ExtResource("damage")
 
 [resource]
 script = ExtResource("1_spell")
 display_name = "Fan"
 shape = 2
+effects = Array[ExtResource("effect")]([SubResource("Resource_effect")])

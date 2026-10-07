@@ -34,7 +34,6 @@ static func tiles(
     return result
 
 
-## Foes for damage, the caster's side for healing
 static func targets(spell: Spell, caster: Entity, facing: Vector2i) -> Array[Entity]:
     var state: FloorState = caster.floor_state
     var result: Array[Entity] = []
@@ -42,8 +41,7 @@ static func targets(spell: Spell, caster: Entity, facing: Vector2i) -> Array[Ent
         var entity: Entity = state.occupancy.get_entity(p)
         if entity == null:
             continue
-        var is_foe: bool = caster.is_foe(entity)
-        if is_foe == (spell.effect == Spell.Effect.DAMAGE):
+        if caster.is_foe(entity) == (spell.targets == Spell.Targets.FOES):
             result.append(entity)
     return result
 

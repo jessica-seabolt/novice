@@ -44,18 +44,5 @@ func cast(spell: Spell) -> void:
     var targets: Array[Entity] = SpellArea.targets(spell, _entity, _entity.facing)
     SignalBus.spell_cast.emit(_entity, spell, tiles)
     for target: Entity in targets:
-        _affect(spell, target)
-
-
-func _affect(spell: Spell, target: Entity) -> void:
-    var target_stats: Stats = Stats.of(target)
-    if target_stats == null:
-        return
-    var rng: RandomNumberGenerator = _entity.floor_state.rng
-    match spell.effect:
-        Spell.Effect.DAMAGE:
-            var attack: int = Stats.of(_entity).stat_block.attack
-            var defense: int = target_stats.stat_block.defense
-            target_stats.take_damage(Dice.roll_damage(spell.power, attack, defense, rng))
-        Spell.Effect.HEAL:
-            target_stats.heal(Dice.roll_exploding(spell.power, rng))
+        for effect: Effect in spell.effects:
+            effect.apply(_entity, target)

@@ -51,6 +51,15 @@ func heal(amount: int) -> void:
     SignalBus.entity_healed.emit(_entity, healed)
 
 
+func restore_mana(amount: int) -> void:
+    var restored: int = mini(amount, stat_block.max_mana - mana)
+    if restored <= 0:
+        return
+    mana += restored
+    changed.emit()
+    SignalBus.mana_restored.emit(_entity, restored)
+
+
 func spend_mana(amount: int) -> void:
     mana = maxi(0, mana - amount)
     changed.emit()

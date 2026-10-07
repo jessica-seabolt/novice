@@ -12,8 +12,8 @@ const SEARCH_SLACK: int = 5
 ## Extra tiles a detour around a blocking entity may add
 const DETOUR_LIMIT: int = 4
 const NO_ROOM: int = -1
-## Healing is only worth it below this share of max HP
-const HEAL_BELOW: float = 0.5
+## Only turns to spells on its own side below this share of max HP
+const SUPPORT_BELOW: float = 0.5
 
 var _state: MobAI.State = MobAI.State.WANDER
 # Next tile first
@@ -90,10 +90,16 @@ func _directions_to_try(state: FloorState, spell: Spell) -> Array[Vector2i]:
 
 func _is_worth_casting(state: FloorState, spell: Spell, direction: Vector2i) -> bool:
     var targets: Array[Entity] = SpellArea.targets(spell, _entity, direction)
-    if spell.effect == Spell.Effect.DAMAGE:
+    if spell.targets == Spell.Targets.FOES:
         return state.player in targets
     var stats: Stats = Stats.of(_entity)
-    return _entity in targets and stats.hp < stats.stat_block.max_hp * HEAL_BELOW
+    if stats.hp >= stats.stat_block.max_hp * SUPPORT_BELOW:
+        return false
+    for target: Entity in targets:
+        for effect: Effect in spell.effects:
+            if effect.is_useful(target):
+                return true
+    return false
 
 
 # The turn waits for the cast to play out, so casts happen one at a time

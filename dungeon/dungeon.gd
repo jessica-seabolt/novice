@@ -1,7 +1,7 @@
 class_name Dungeon extends Node2D
 ## Builds each floor and runs its turns
 
-const TEST_CONFIG: DungeonConfig = preload("res://dungeon/config/dc_test.tres")
+const TEST_CONFIG: DungeonConfig = preload("res://dungeon/config/dungeon_config_test.tres")
 const PLAYER_SCENE: PackedScene = preload("res://entity/player/player.tscn")
 const MOB_SCENE: PackedScene = preload("res://entity/mob/mob.tscn")
 const HUD_SCENE: PackedScene = preload("res://ui/hud/hud.tscn")

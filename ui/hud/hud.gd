@@ -23,6 +23,7 @@ func _ready() -> void:
     SignalBus.entity_damaged.connect(_on_entity_damaged)
     SignalBus.entity_defeated.connect(_on_entity_defeated)
     SignalBus.entity_healed.connect(_on_entity_healed)
+    SignalBus.mana_restored.connect(_on_mana_restored)
     SignalBus.spell_cast.connect(_on_spell_cast)
     SignalBus.cast_refused.connect(_on_cast_refused)
     _popup_timer.timeout.connect(_popup.hide)
@@ -91,6 +92,10 @@ func _on_entity_defeated(entity: Entity) -> void:
 
 func _on_entity_healed(entity: Entity, amount: int) -> void:
     add_message("%s recovered %d HP" % [entity.display_name, amount])
+
+
+func _on_mana_restored(entity: Entity, amount: int) -> void:
+    add_message("%s recovered %d MP" % [entity.display_name, amount])
 
 
 func _on_spell_cast(caster: Entity, spell: Spell, _tiles: Array[Vector2i]) -> void:
