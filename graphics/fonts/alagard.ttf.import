@@ -2,13 +2,13 @@
 
 importer="font_data_dynamic"
 type="FontFile"
-uid="uid://c33wx2ksfbic0"
-path="res://.godot/imported/dogicapixelbold.otf-556f7a66f2f33bba12fcfb780fad38b4.fontdata"
+uid="uid://dom486uxa1uh5"
+path="res://.godot/imported/alagard.ttf-82d349b9c897d1cbfa33997d0643c1f4.fontdata"
 
 [deps]
 
-source_file="res://graphics/fonts/dogicapixelbold.otf"
-dest_files=["res://.godot/imported/dogicapixelbold.otf-556f7a66f2f33bba12fcfb780fad38b4.fontdata"]
+source_file="res://graphics/fonts/alagard.ttf"
+dest_files=["res://.godot/imported/alagard.ttf-82d349b9c897d1cbfa33997d0643c1f4.fontdata"]
 
 [params]
 
@@ -25,7 +25,7 @@ modulate_color_glyphs=false
 hinting=0
 subpixel_positioning=0
 keep_rounding_remainders=true
-oversampling=0.0
+oversampling=2.0
 Fallbacks=null
 fallbacks=[]
 Compress=null

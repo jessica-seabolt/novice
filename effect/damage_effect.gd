@@ -11,3 +11,7 @@ func apply(source: Entity, target: Entity) -> void:
     var defense: int = target_stats.stat_block.defense
     var rng: RandomNumberGenerator = source.floor_state.rng
     target_stats.take_damage(Dice.roll_damage(power, attack, defense, rng))
+
+
+func strengthen() -> void:
+    power += 1

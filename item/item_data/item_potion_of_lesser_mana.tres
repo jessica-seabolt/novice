@@ -1,0 +1,29 @@
+[gd_resource type="Resource" script_class="ItemData" format=3 uid="uid://c0itt47iyy3"]
+
+[ext_resource type="Script" uid="uid://ebha4j45jol4" path="res://effect/effect.gd" id="1_ff0ic"]
+[ext_resource type="Script" uid="uid://ccgouov8rblui" path="res://effect/restore_mana_effect.gd" id="2_ff0ic"]
+[ext_resource type="Script" uid="uid://cm2smpj2k7xwo" path="res://item/item_data/item_data.gd" id="3_61esy"]
+[ext_resource type="Texture2D" uid="uid://dvqb4rpuplb2p" path="res://graphics/sprites/mana_potion.png" id="4_ff0ic"]
+
+[sub_resource type="Resource" id="Resource_ff0ic"]
+script = ExtResource("2_ff0ic")
+metadata/_custom_type_script = "uid://ccgouov8rblui"
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_mvuyq"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("4_ff0ic")
+}],
+"loop": 1,
+"name": &"default",
+"speed": 5.0
+}]
+
+[resource]
+script = ExtResource("3_61esy")
+display_name = "Potion of Lesser Mana"
+description = "Restores 1d6 Mana."
+sprite_frames = SubResource("SpriteFrames_mvuyq")
+effects = Array[ExtResource("1_ff0ic")]([SubResource("Resource_ff0ic")])
+metadata/_custom_type_script = "uid://cm2smpj2k7xwo"

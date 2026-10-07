@@ -1,18 +1,51 @@
 [gd_resource type="Resource" script_class="DungeonConfig" format=3 uid="uid://cob8tfl3l1gnx"]
 
 [ext_resource type="Script" uid="uid://ckcnwl4yosetn" path="res://dungeon/config/dungeon_config.gd" id="1_wunx1"]
-[ext_resource type="Script" path="res://dungeon/config/mob_spawn.gd" id="mob_spawn"]
-[ext_resource type="Script" path="res://dungeon/config/item_spawn.gd" id="item_spawn"]
-[ext_resource type="Resource" path="res://entity/mob/mob_data/mob_data_test.tres" id="mob_test"]
-[ext_resource type="Resource" uid="uid://ge55cxwo31h5" path="res://item/item_data/item_data_test.tres" id="item_test"]
+[ext_resource type="Resource" uid="uid://dk4deolaneils" path="res://item/item_data/item_potion_of_lesser_health.tres" id="2_st84t"]
+[ext_resource type="Resource" uid="uid://dwdxpcqxscnh3" path="res://item/item_data/item_data_scroll_of_fan.tres" id="3_nucxt"]
+[ext_resource type="Resource" uid="uid://c0itt47iyy3" path="res://item/item_data/item_potion_of_lesser_mana.tres" id="3_ys6k1"]
+[ext_resource type="Resource" uid="uid://drdhcs7jksq0t" path="res://item/item_data/item_data_scroll_of_mending.tres" id="4_ys6k1"]
+[ext_resource type="Resource" uid="uid://66bdtc6tnlh3" path="res://item/item_data/item_data_scroll_of_nova.tres" id="5_yqh8e"]
+[ext_resource type="Resource" uid="uid://bovwllk6mpsa8" path="res://item/item_data/item_data_scroll_of_quake.tres" id="6_vugrq"]
+[ext_resource type="Resource" uid="uid://cpl8cvew77kqj" path="res://item/item_data/item_data_scroll_of_spark.tres" id="7_3tx2v"]
+[ext_resource type="Script" uid="uid://dajxrsbomfj0w" path="res://dungeon/config/item_spawn.gd" id="item_spawn"]
+[ext_resource type="Script" uid="uid://c7c0j68w4o3ch" path="res://dungeon/config/mob_spawn.gd" id="mob_spawn"]
+[ext_resource type="Resource" uid="uid://dnclclxmy007i" path="res://entity/mob/mob_data/mob_data_test.tres" id="mob_test"]
+
+[sub_resource type="Resource" id="ItemSpawn_test"]
+script = ExtResource("item_spawn")
+item = ExtResource("2_st84t")
+weight = 3
+
+[sub_resource type="Resource" id="Resource_qa8rf"]
+script = ExtResource("item_spawn")
+item = ExtResource("3_ys6k1")
+weight = 3
+metadata/_custom_type_script = "uid://dajxrsbomfj0w"
+
+[sub_resource type="Resource" id="ItemSpawn_scroll_mend"]
+script = ExtResource("item_spawn")
+item = ExtResource("3_nucxt")
+
+[sub_resource type="Resource" id="ItemSpawn_scroll_fan"]
+script = ExtResource("item_spawn")
+item = ExtResource("4_ys6k1")
+
+[sub_resource type="Resource" id="ItemSpawn_scroll_nova"]
+script = ExtResource("item_spawn")
+item = ExtResource("5_yqh8e")
+
+[sub_resource type="Resource" id="ItemSpawn_scroll_spark"]
+script = ExtResource("item_spawn")
+item = ExtResource("6_vugrq")
+
+[sub_resource type="Resource" id="ItemSpawn_scroll_quake"]
+script = ExtResource("item_spawn")
+item = ExtResource("7_3tx2v")
 
 [sub_resource type="Resource" id="MobSpawn_test"]
 script = ExtResource("mob_spawn")
 mob = ExtResource("mob_test")
-
-[sub_resource type="Resource" id="ItemSpawn_test"]
-script = ExtResource("item_spawn")
-item = ExtResource("item_test")
 
 [resource]
 script = ExtResource("1_wunx1")
@@ -28,5 +61,5 @@ mob_count_max = 6
 mob_pool = Array[ExtResource("mob_spawn")]([SubResource("MobSpawn_test")])
 item_count_min = 2
 item_count_max = 5
-item_pool = Array[ExtResource("item_spawn")]([SubResource("ItemSpawn_test")])
+item_pool = Array[ExtResource("item_spawn")]([SubResource("ItemSpawn_test"), SubResource("Resource_qa8rf"), SubResource("ItemSpawn_scroll_mend"), SubResource("ItemSpawn_scroll_fan"), SubResource("ItemSpawn_scroll_nova"), SubResource("ItemSpawn_scroll_spark"), SubResource("ItemSpawn_scroll_quake")])
 metadata/_custom_type_script = "uid://ckcnwl4yosetn"

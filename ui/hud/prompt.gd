@@ -14,6 +14,12 @@ func _ready() -> void:
     _menu.cancelled.connect(answered.emit.bind(-1))
 
 
+## Answers -1, as if cancelled
+func cancel() -> void:
+    if visible:
+        answered.emit(-1)
+
+
 ## The chosen option's index, or -1 if cancelled
 func ask(question: String, options: Array[String]) -> int:
     _text.text = question

@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="ItemData" format=3 uid="uid://bovwllk6mpsa8"]
+
+[ext_resource type="SpriteFrames" uid="uid://ddkhfo7v7gqgh" path="res://graphics/sprites/sprite_frames/scroll_sprite_frame.tres" id="5_0wru2"]
+[ext_resource type="Script" uid="uid://ebha4j45jol4" path="res://effect/effect.gd" id="effect"]
+[ext_resource type="Script" uid="uid://cm2smpj2k7xwo" path="res://item/item_data/item_data.gd" id="item_data"]
+[ext_resource type="Script" uid="uid://b7o7g6q8odf2v" path="res://effect/learn_spell_effect.gd" id="learn"]
+[ext_resource type="Resource" uid="uid://2mnrucml8gs5" path="res://entity/spells/spell_quake.tres" id="spell"]
+
+[sub_resource type="Resource" id="Resource_learn"]
+script = ExtResource("learn")
+spell = ExtResource("spell")
+
+[resource]
+script = ExtResource("item_data")
+display_name = "Scroll of Quake"
+description = "Teaches Quake, or strengthens it if already known."
+use_label = "Learn"
+sprite_frames = ExtResource("5_0wru2")
+effects = Array[ExtResource("effect")]([SubResource("Resource_learn")])

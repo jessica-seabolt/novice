@@ -1,45 +1,53 @@
-[gd_scene format=3]
+[gd_scene format=3 uid="uid://bkmqho0642rsr"]
 
-[ext_resource type="Script" path="res://ui/hud/hud.gd" id="1_hud"]
+[ext_resource type="Script" uid="uid://bfdaxoci00exo" path="res://ui/hud/hud.gd" id="1_hud"]
 [ext_resource type="PackedScene" path="res://ui/hud/stat_bar.tscn" id="2_bar"]
 [ext_resource type="Texture2D" uid="uid://dy36dhx3ys3ij" path="res://graphics/ui/health_bar.png" id="3_health"]
 [ext_resource type="Texture2D" uid="uid://3uh4v0yatp8m" path="res://graphics/ui/empty_health_bar.png" id="4_health_empty"]
 [ext_resource type="Texture2D" uid="uid://1kam2hluku4o" path="res://graphics/ui/mana_bar.png" id="5_mana"]
 [ext_resource type="Texture2D" uid="uid://jfqbqr4jycja" path="res://graphics/ui/empty_mana_bar.png" id="6_mana_empty"]
 [ext_resource type="PackedScene" path="res://ui/window_frame.tscn" id="7_frame"]
-[ext_resource type="Script" path="res://ui/hud/log_window.gd" id="9_log"]
+[ext_resource type="Script" uid="uid://bhotsk3gbu564" path="res://ui/hud/log_window.gd" id="9_log"]
 [ext_resource type="Texture2D" uid="uid://j3bx7tgtk11o" path="res://graphics/ui/scroll_tab.png" id="10_tab"]
-[ext_resource type="Script" path="res://ui/scroll_tab.gd" id="11_scroll_tab"]
-[ext_resource type="Script" path="res://ui/hud/prompt.gd" id="12_prompt"]
+[ext_resource type="Script" uid="uid://cfd487f326pcy" path="res://ui/scroll_tab.gd" id="11_scroll_tab"]
+[ext_resource type="Script" uid="uid://dp15tmoxxy1fx" path="res://ui/hud/prompt.gd" id="12_prompt"]
 [ext_resource type="PackedScene" path="res://ui/menu/selection_menu.tscn" id="13_menu"]
-[ext_resource type="Script" path="res://ui/hud/main_menu.gd" id="14_main_menu"]
-[ext_resource type="Script" path="res://ui/hud/spell_slots.gd" id="15_spell_slots"]
+[ext_resource type="Script" uid="uid://bgkgt7m2yt5fn" path="res://ui/hud/main_menu.gd" id="14_main_menu"]
+[ext_resource type="Script" uid="uid://dukbwpnbrjnnx" path="res://ui/hud/spell_slots.gd" id="15_spell_slots"]
+[ext_resource type="Script" uid="uid://cyu1exdarkqrf" path="res://ui/hud/item_info.gd" id="16_item_info"]
 
-[node name="Hud" type="CanvasLayer"]
+[node name="Hud" type="CanvasLayer" unique_id=942269427]
 script = ExtResource("1_hud")
 
-[node name="Bars" type="VBoxContainer" parent="."]
+[node name="Root" type="Control" parent="." unique_id=1164100663]
+layout_mode = 3
+anchors_preset = 0
+scale = Vector2(2, 2)
+mouse_filter = 2
+
+[node name="Bars" type="VBoxContainer" parent="Root" unique_id=1870480591]
+layout_mode = 0
 offset_left = 4.0
 offset_top = 4.0
 offset_right = 124.0
 offset_bottom = 22.0
 theme_override_constants/separation = 2
 
-[node name="Health" parent="Bars" instance=ExtResource("2_bar")]
+[node name="Health" parent="Root/Bars" unique_id=1578470653 instance=ExtResource("2_bar")]
 layout_mode = 2
 label = "HP"
 full_texture = ExtResource("3_health")
 empty_texture = ExtResource("4_health_empty")
 
-[node name="Mana" parent="Bars" instance=ExtResource("2_bar")]
+[node name="Mana" parent="Root/Bars" unique_id=1164411228 instance=ExtResource("2_bar")]
 layout_mode = 2
 label = "MP"
 full_texture = ExtResource("5_mana")
 empty_texture = ExtResource("6_mana_empty")
 
-[node name="Popup" type="Control" parent="."]
+[node name="Popup" type="Control" parent="Root" unique_id=1132645491]
 visible = false
-layout_mode = 3
+layout_mode = 1
 anchors_preset = 12
 anchor_top = 1.0
 anchor_right = 1.0
@@ -52,10 +60,10 @@ grow_horizontal = 2
 grow_vertical = 0
 mouse_filter = 2
 
-[node name="Frame" parent="Popup" instance=ExtResource("7_frame")]
+[node name="Frame" parent="Root/Popup" unique_id=1660234632 instance=ExtResource("7_frame")]
 layout_mode = 1
 
-[node name="Text" type="Label" parent="Popup"]
+[node name="Text" type="Label" parent="Root/Popup" unique_id=1916463111]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -65,12 +73,13 @@ offset_right = -8.0
 grow_horizontal = 2
 grow_vertical = 2
 vertical_alignment = 1
+autowrap_mode = 3
 
-[node name="Timer" type="Timer" parent="Popup"]
+[node name="Timer" type="Timer" parent="Root/Popup" unique_id=2108005263]
 one_shot = true
 
-[node name="LogWindow" type="Control" parent="."]
-layout_mode = 3
+[node name="LogWindow" type="Control" parent="Root" unique_id=693059532]
+layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -82,10 +91,10 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("9_log")
 
-[node name="Frame" parent="LogWindow" instance=ExtResource("7_frame")]
+[node name="Frame" parent="Root/LogWindow" unique_id=1003311253 instance=ExtResource("7_frame")]
 layout_mode = 1
 
-[node name="Scroll" type="ScrollContainer" parent="LogWindow"]
+[node name="Scroll" type="ScrollContainer" parent="Root/LogWindow" unique_id=1184198506]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -98,19 +107,19 @@ grow_horizontal = 2
 grow_vertical = 2
 horizontal_scroll_mode = 0
 
-[node name="Text" type="Label" parent="LogWindow/Scroll"]
+[node name="Text" type="Label" parent="Root/LogWindow/Scroll" unique_id=1158493382]
 layout_mode = 2
 size_flags_horizontal = 3
 autowrap_mode = 3
 
-[node name="Tab" type="TextureRect" parent="LogWindow" node_paths=PackedStringArray("scroll")]
+[node name="Tab" type="TextureRect" parent="Root/LogWindow" unique_id=1890722158 node_paths=PackedStringArray("scroll")]
 layout_mode = 0
 texture = ExtResource("10_tab")
 script = ExtResource("11_scroll_tab")
 scroll = NodePath("../Scroll")
 
-[node name="Prompt" type="Control" parent="."]
-layout_mode = 3
+[node name="Prompt" type="Control" parent="Root" unique_id=475412617]
+layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -119,7 +128,7 @@ grow_vertical = 2
 mouse_filter = 2
 script = ExtResource("12_prompt")
 
-[node name="Question" type="Control" parent="Prompt"]
+[node name="Question" type="Control" parent="Root/Prompt" unique_id=1340133894]
 layout_mode = 1
 anchors_preset = 12
 anchor_top = 1.0
@@ -133,10 +142,10 @@ grow_horizontal = 2
 grow_vertical = 0
 mouse_filter = 2
 
-[node name="Frame" parent="Prompt/Question" instance=ExtResource("7_frame")]
+[node name="Frame" parent="Root/Prompt/Question" unique_id=678076056 instance=ExtResource("7_frame")]
 layout_mode = 1
 
-[node name="Text" type="Label" parent="Prompt/Question"]
+[node name="Text" type="Label" parent="Root/Prompt/Question" unique_id=1712229661]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -147,23 +156,62 @@ grow_horizontal = 2
 grow_vertical = 2
 vertical_alignment = 1
 
-[node name="Menu" parent="Prompt" instance=ExtResource("13_menu")]
+[node name="Menu" parent="Root/Prompt" unique_id=675203592 instance=ExtResource("13_menu")]
 layout_mode = 0
 
-[node name="MainMenu" type="Node" parent="." node_paths=PackedStringArray("log_window")]
+[node name="MainMenu" type="Control" parent="Root" unique_id=1163660438 node_paths=PackedStringArray("log_window")]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
 script = ExtResource("14_main_menu")
 log_window = NodePath("../LogWindow")
 
-[node name="Menu" parent="MainMenu" instance=ExtResource("13_menu")]
+[node name="Menu" parent="Root/MainMenu" unique_id=1978979522 instance=ExtResource("13_menu")]
+layout_mode = 0
 
-[node name="SpellMenu" parent="MainMenu" instance=ExtResource("13_menu")]
+[node name="SpellMenu" parent="Root/MainMenu" unique_id=539105173 instance=ExtResource("13_menu")]
+layout_mode = 0
 
-[node name="ItemMenu" parent="MainMenu" instance=ExtResource("13_menu")]
+[node name="ItemMenu" parent="Root/MainMenu" unique_id=2040456937 instance=ExtResource("13_menu")]
+layout_mode = 0
+max_text_width = 88
+row_gap = 2
 
-[node name="ItemActionMenu" parent="MainMenu" instance=ExtResource("13_menu")]
+[node name="ItemActionMenu" parent="Root/MainMenu" unique_id=608207893 instance=ExtResource("13_menu")]
+layout_mode = 0
 
-[node name="SpellSlots" type="Control" parent="."]
-layout_mode = 3
+[node name="ItemInfo" type="Control" parent="Root/MainMenu" unique_id=1514431195]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 4.0
+offset_top = -28.0
+offset_right = -4.0
+offset_bottom = -4.0
+grow_horizontal = 2
+grow_vertical = 0
+mouse_filter = 2
+script = ExtResource("16_item_info")
+
+[node name="Frame" parent="Root/MainMenu/ItemInfo" unique_id=903397032 instance=ExtResource("7_frame")]
+layout_mode = 1
+
+[node name="Name" type="Label" parent="Root/MainMenu/ItemInfo" unique_id=196805529]
+layout_mode = 0
+autowrap_mode = 3
+
+[node name="Description" type="Label" parent="Root/MainMenu/ItemInfo" unique_id=924334174]
+layout_mode = 0
+autowrap_mode = 3
+
+[node name="SpellSlots" type="Control" parent="Root" unique_id=1413424263]
+layout_mode = 1
 anchors_preset = 3
 anchor_left = 1.0
 anchor_top = 1.0
@@ -178,10 +226,10 @@ grow_vertical = 0
 mouse_filter = 2
 script = ExtResource("15_spell_slots")
 
-[node name="Frame" parent="SpellSlots" instance=ExtResource("7_frame")]
+[node name="Frame" parent="Root/SpellSlots" unique_id=2053401514 instance=ExtResource("7_frame")]
 layout_mode = 1
 
-[node name="Content" type="MarginContainer" parent="SpellSlots"]
+[node name="Content" type="MarginContainer" parent="Root/SpellSlots" unique_id=1644877524]
 layout_mode = 0
 mouse_filter = 2
 theme_override_constants/margin_left = 8
@@ -189,7 +237,7 @@ theme_override_constants/margin_top = 7
 theme_override_constants/margin_right = 8
 theme_override_constants/margin_bottom = 7
 
-[node name="Rows" type="VBoxContainer" parent="SpellSlots/Content"]
+[node name="Rows" type="VBoxContainer" parent="Root/SpellSlots/Content" unique_id=195426282]
 layout_mode = 2
 mouse_filter = 2
 theme_override_constants/separation = 4

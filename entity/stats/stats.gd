@@ -4,7 +4,7 @@ class_name Stats extends Node
 signal changed
 signal damaged(amount: int)
 
-## Turns without taking damage before stepping heals (needs tuning lol)
+## Turns without taking damage before stepping heals
 const REGEN_DELAY: int = 5
 
 @export var stat_block: StatBlock
@@ -36,8 +36,9 @@ func take_damage(amount: int) -> void:
     hp = maxi(0, hp - amount)
     _turns_since_damage = 0
     changed.emit()
-    damaged.emit(amount)
+    # Announced before anything reacts, like a held item healing
     SignalBus.entity_damaged.emit(_entity, amount)
+    damaged.emit(amount)
     if hp == 0:
         SignalBus.entity_defeated.emit(_entity)
 

@@ -4,7 +4,9 @@ class_name Dungeon extends Node2D
 const TEST_CONFIG: DungeonConfig = preload("res://dungeon/config/dungeon_config_test.tres")
 const PLAYER_SCENE: PackedScene = preload("res://entity/player/player.tscn")
 const MOB_SCENE: PackedScene = preload("res://entity/mob/mob.tscn")
-const HUD_SCENE: PackedScene = preload("res://ui/hud/hud.tscn")
+
+## Lives outside the world's viewport, so it draws at the screen's resolution
+@export var hud: Hud
 
 var config: DungeonConfig
 var floor_state: FloorState
@@ -12,7 +14,6 @@ var player: Entity
 var turn_system: TurnSystem
 var floor_number: int = 1
 var mobs: Array[Entity] = []
-var hud: Hud
 # Right after the floor layers, so items draw under entities
 var _floor_items: FloorItems = FloorItems.new()
 # To tell arriving on stairs from standing on them
@@ -27,8 +28,6 @@ func _ready() -> void:
     _floor_items.name = "Items"
     _floor_items.setup(floor_layer)
     feature_layer.add_sibling(_floor_items)
-    hud = HUD_SCENE.instantiate()
-    add_child(hud)
     add_child(DamageNumbers.new())
     add_child(CombatSounds.new())
     add_child(SpellFlash.new())
@@ -80,6 +79,7 @@ func _on_entity_defeated(entity: Entity) -> void:
         floor_number = 1
         Stats.of(player).restore()
         Inventory.of(player).clear()
+        Spellbook.of(player).reset()
         hud.clear_log()
         _start_floor.call_deferred()
         return
@@ -139,6 +139,7 @@ func _make_mob(data: MobData) -> Entity:
     mob.display_name = data.display_name
     var sprite: AnimatedSprite2D = mob.get_node("AnimatedSprite2D")
     sprite.sprite_frames = data.sprite_frames
+    SpriteAnchor.apply(sprite, data.sprite_anchor)
     sprite.play()
     Stats.of(mob).stat_block = data.stat_block
     return mob

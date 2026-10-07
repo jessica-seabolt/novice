@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://v3ud3ljskmyo"
-path="res://.godot/imported/test_mob_sprite.png-b6549bac906c8f627f992f69ddb9117b.ctex"
+uid="uid://b82u7ylqtutgx"
+path="res://.godot/imported/spell_scroll.png-c0cf7a1b1e49d91440791a778f7b7dc1.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://graphics/sprites/test_mob_sprite.png"
-dest_files=["res://.godot/imported/test_mob_sprite.png-b6549bac906c8f627f992f69ddb9117b.ctex"]
+source_file="res://graphics/sprites/spell_scroll.png"
+dest_files=["res://.godot/imported/spell_scroll.png-c0cf7a1b1e49d91440791a778f7b7dc1.ctex"]
 
 [params]
 

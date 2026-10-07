@@ -1,15 +1,12 @@
 [gd_resource type="Resource" script_class="StatBlock" format=3 uid="uid://m5te562q5y83"]
 
 [ext_resource type="Script" uid="uid://djf0j5cmysu4l" path="res://entity/stats/stat_block.gd" id="1_s6wbc"]
-[ext_resource type="Script" uid="uid://b8dxsn2nja4a5" path="res://entity/spells/spell.gd" id="spell"]
-[ext_resource type="Resource" uid="uid://csoyrx27we55h" path="res://entity/spells/spell_fan.tres" id="sp_fan"]
-[ext_resource type="Resource" uid="uid://v68b7kcn0q5t" path="res://entity/spells/spell_mend.tres" id="sp_mend"]
-[ext_resource type="Resource" uid="uid://2mnrucml8gs5" path="res://entity/spells/spell_quake.tres" id="sp_quake"]
-[ext_resource type="Resource" uid="uid://bh7m34x213q2n" path="res://entity/spells/spell_spark.tres" id="sp_spark"]
+[ext_resource type="Script" uid="uid://b8dxsn2nja4a5" path="res://entity/spells/spell.gd" id="2_yjc2k"]
 
 [resource]
 script = ExtResource("1_s6wbc")
 max_hp = 50
+attack = 5
+defense = 5
 max_mana = 20
-spells = Array[ExtResource("spell")]([ExtResource("sp_mend"), ExtResource("sp_fan"), ExtResource("sp_spark"), ExtResource("sp_quake")])
 metadata/_custom_type_script = "uid://djf0j5cmysu4l"

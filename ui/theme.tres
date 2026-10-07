@@ -1,6 +1,6 @@
 [gd_resource type="Theme" format=3 uid="uid://ky71040cdqv"]
 
-[ext_resource type="FontFile" uid="uid://djdk2tv3ospqs" path="res://graphics/fonts/dogicapixel.otf" id="1_font"]
+[ext_resource type="FontFile" uid="uid://dom486uxa1uh5" path="res://graphics/fonts/alagard.ttf" id="1_font"]
 [ext_resource type="Texture2D" uid="uid://ouoq1o01pkx6" path="res://graphics/ui/scroll_bar.png" id="2_bar"]
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_tab"]

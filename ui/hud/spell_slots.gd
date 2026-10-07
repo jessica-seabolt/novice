@@ -32,6 +32,14 @@ func _process(_delta: float) -> void:
 func setup(player: Entity) -> void:
     _spellbook = Spellbook.of(player)
     _player_control = PlayerControl.of(player)
+    _spellbook.changed.connect(_refresh)
+    _refresh()
+
+
+func _refresh() -> void:
+    for row: Node in _rows.get_children():
+        _rows.remove_child(row)
+        row.queue_free()
     for i: int in range(mini(_spellbook.spells.size(), BUTTONS.size())):
         var row: Label = Label.new()
         row.text = "%s  %s" % [BUTTONS[i], _spellbook.spells[i].display_name]

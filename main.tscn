@@ -1,0 +1,27 @@
+[gd_scene format=3 uid="uid://xalgdskdj486"]
+
+[ext_resource type="PackedScene" uid="uid://c1goj0vmubhf4" path="res://dungeon/dungeon.tscn" id="1_dungeon"]
+[ext_resource type="PackedScene" uid="uid://bkmqho0642rsr" path="res://ui/hud/hud.tscn" id="2_hud"]
+
+[node name="Main" type="Node" unique_id=1855418167]
+
+[node name="Hud" parent="." unique_id=1261307425 instance=ExtResource("2_hud")]
+
+[node name="World" type="SubViewportContainer" parent="." unique_id=598685773]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+stretch = true
+stretch_shrink = 2
+
+[node name="Viewport" type="SubViewport" parent="World" unique_id=1098722617]
+handle_input_locally = false
+canvas_item_default_texture_filter = 0
+size = Vector2i(240, 160)
+render_target_update_mode = 4
+
+[node name="Dungeon" parent="World/Viewport" unique_id=930244168 node_paths=PackedStringArray("hud") instance=ExtResource("1_dungeon")]
+hud = NodePath("../../../Hud")

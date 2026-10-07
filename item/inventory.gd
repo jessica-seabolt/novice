@@ -28,6 +28,8 @@ static func of(entity: Entity) -> Inventory:
 
 func _ready() -> void:
     _entity.stepped.connect(_on_stepped)
+    if _held != null:
+        _held.used_up.connect(remove)
 
 
 ## Fills existing stacks first, then empty slots; returns how many didn't fit
@@ -50,6 +52,10 @@ func add(stack: ItemStack) -> int:
 ## For whoever controls the entity; using and dropping take a turn
 func request(stack: ItemStack, action: Inventory.Action) -> void:
     requested.emit(stack, action)
+
+
+func can_use(stack: ItemStack) -> bool:
+    return stack.item.can_use(_entity)
 
 
 func can_drop() -> bool:

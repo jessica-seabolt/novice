@@ -14,7 +14,7 @@ NoVice is a top-down roguelike dungeon crawler. Players will travel through dung
 2. Clone the repo:
 ```git clone https://github.com/jessica-seabolt/novice```
 3. Open Godot, click **Import**, and select the ```project.godot``` file in the cloned folder.
-4. Run the ```dungeon/dungeon.tscn``` scene to test.
+4. Press **F5** (Run Project) to play. The main scene is ```main.tscn```; ```dungeon/dungeon.tscn``` won't run on its own, since the HUD lives in the main scene.
 
 ## Roadmap
 - [x] Dungeon floor generation
@@ -34,13 +34,17 @@ NoVice is a top-down roguelike dungeon crawler. Players will travel through dung
 - [x] Spells and targeting
 - [x] Mana
 - [x] Items and item spawning
-- [ ] Spell scrolls
+- [x] Spell scrolls
 - [ ] Spending stat points
 - [ ] Traps and trap spawning
 - [ ] Minimap
 - [ ] Music
 - [ ] Dialogue
 - [ ] Allies
+
+## Credits
+- [Alagard](https://www.dafont.com/alagard.font) font by Hewett Tsoi
+- [Press Start 2P](https://fonts.google.com/specimen/Press+Start+2P) font by CodeMan38 (SIL Open Font License)
 
 ## License
 All Rights Reserved — © 2026 Jessica Seabolt.

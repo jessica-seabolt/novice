@@ -1,13 +1,18 @@
 class_name HealEffect extends Effect
 ## Restores HP
 
-@export_range(1, 1000) var amount: int = 1
+## Dice rolled
+@export_range(1, 10) var power: int = 1
 
 
-func apply(_source: Entity, target: Entity) -> void:
-    Stats.of(target).heal(amount)
+func apply(source: Entity, target: Entity) -> void:
+    Stats.of(target).heal(Dice.roll_exploding(power, source.floor_state.rng))
 
 
 func is_useful(target: Entity) -> bool:
     var stats: Stats = Stats.of(target)
     return stats.hp < stats.stat_block.max_hp
+
+
+func strengthen() -> void:
+    power += 1

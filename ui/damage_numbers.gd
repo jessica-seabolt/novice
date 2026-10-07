@@ -1,7 +1,7 @@
 class_name DamageNumbers extends Node2D
 ## Numbers that rise from whoever takes damage, or green ones for healing
 
-const FONT: FontFile = preload("res://graphics/fonts/dogicapixelbold.otf")
+const FONT: FontFile = preload("res://graphics/fonts/PressStart2P-Regular.ttf")
 const FONT_SIZE: int = 8
 const OUTLINE_SIZE: int = 2
 const RISE: float = 10.0

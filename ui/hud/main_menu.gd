@@ -1,4 +1,4 @@
-class_name MainMenu extends Node
+class_name MainMenu extends Control
 ## The menu opened on the player's turn, leading to spells, items, stats and the log;
 ## also opens the log directly
 
@@ -28,11 +28,14 @@ var _aim_overlay: AimOverlay
 var _inventory: Inventory
 # The stack the item action menu is for
 var _chosen_stack: ItemStack
+# Whether closing the log goes back to this menu
+var _log_from_menu: bool = false
 
 @onready var _menu: SelectionMenu = $Menu
 @onready var _spell_menu: SelectionMenu = $SpellMenu
 @onready var _item_menu: SelectionMenu = $ItemMenu
 @onready var _item_action_menu: SelectionMenu = $ItemActionMenu
+@onready var _item_info: ItemInfo = $ItemInfo
 
 
 func _ready() -> void:
@@ -42,6 +45,8 @@ func _ready() -> void:
     _spell_menu.highlighted.connect(_on_spell_highlighted)
     _spell_menu.chosen.connect(_on_spell_chosen)
     _spell_menu.cancelled.connect(_on_spell_menu_cancelled)
+    _item_menu.highlighted.connect(_on_item_highlighted)
+    _item_menu.closed.connect(_item_info.hide)
     _item_menu.chosen.connect(_on_item_chosen)
     _item_menu.cancelled.connect(_on_item_menu_cancelled)
     _item_action_menu.chosen.connect(_on_item_action_chosen)
@@ -54,6 +59,7 @@ func _unhandled_input(event: InputEvent) -> void:
     if event.is_action_pressed(&"open_menu"):
         Sfx.play(OPEN_SOUND)
         _menu.set_enabled(_available_options())
+        _menu.select_first()
         _open(_menu)
     elif event.is_action_pressed(&"toggle_log"):
         log_window.open()
@@ -67,11 +73,17 @@ func setup(player: Entity) -> void:
     _player_control = PlayerControl.of(player)
     _aim_overlay = AimOverlay.of(player)
     _inventory = Inventory.of(player)
-    var names: Array[String] = []
-    for spell: Spell in _spellbook.spells:
-        names.append(spell.display_name)
-    _spell_menu.set_items(names)
     _menu.set_items(OPTIONS, _available_options())
+
+
+## Closes any of its menus that are open, tidying up as cancelling would
+func close_all() -> void:
+    _log_from_menu = false
+    _aim_overlay.preview(null)
+    _item_menu.set_process_unhandled_input(true)
+    for menu: SelectionMenu in [_menu, _spell_menu, _item_menu, _item_action_menu]:
+        if menu.visible:
+            menu.close()
 
 
 # Stats is greyed out until it exists
@@ -81,33 +93,40 @@ func _available_options() -> Array[bool]:
 
 # In the top right corner
 func _open(menu: SelectionMenu) -> void:
-    var screen_width: float = get_viewport().get_visible_rect().size.x
-    menu.position = Vector2(screen_width - menu.size.x - MARGIN, MARGIN)
+    menu.position = Vector2(size.x - menu.size.x - MARGIN, MARGIN)
     menu.open()
 
 
 func _on_chosen(index: int) -> void:
     match index:
         MainMenu.Option.SPELLS:
+            var names: Array[String] = []
             var affordable: Array[bool] = []
             for spell: Spell in _spellbook.spells:
+                names.append(spell.display_name)
                 affordable.append(_spellbook.can_cast(spell))
-            _spell_menu.set_enabled(affordable)
+            _spell_menu.set_items(names, affordable)
             _menu.close()
             _open(_spell_menu)
         MainMenu.Option.ITEMS:
             var labels: Array[String] = []
+            var icons: Array[Texture2D] = []
             for stack: ItemStack in _inventory.stacks:
+                # Marked up front, where a long name can't cut it off
                 var held: bool = _inventory.is_equipped(stack)
-                labels.append(stack.get_label() + (" (held)" if held else ""))
-            _item_menu.set_items(labels)
+                labels.append(("* " if held else "") + stack.get_label())
+                icons.append(stack.item.get_icon())
+            _item_menu.set_items(labels, [], icons)
             _menu.close()
             _open(_item_menu)
         MainMenu.Option.LOG:
             _menu.close()
+            _log_from_menu = true
             log_window.open()
             await log_window.closed
-            _menu.open()
+            if _log_from_menu:
+                _log_from_menu = false
+                _menu.open()
 
 
 func _on_spell_highlighted(index: int) -> void:
@@ -126,11 +145,17 @@ func _on_spell_menu_cancelled() -> void:
     _menu.open()
 
 
+func _on_item_highlighted(index: int) -> void:
+    var stack: ItemStack = _inventory.stacks[index]
+    _item_info.show_item(stack, _inventory.is_equipped(stack))
+
+
 func _on_item_chosen(index: int) -> void:
     _chosen_stack = _inventory.stacks[index]
     var held: bool = _inventory.is_equipped(_chosen_stack)
-    var options: Array[String] = ["Use", "Unequip" if held else "Equip", "Drop"]
-    var available: Array[bool] = [_chosen_stack.item.is_usable(), true, _inventory.can_drop()]
+    var use_label: String = _chosen_stack.item.use_label
+    var options: Array[String] = [use_label, "Unequip" if held else "Equip", "Drop"]
+    var available: Array[bool] = [_inventory.can_use(_chosen_stack), true, _inventory.can_drop()]
     _item_action_menu.set_items(options, available)
     # Beside the item list, which stays up but stops taking input
     _item_menu.set_process_unhandled_input(false)
