@@ -158,6 +158,10 @@ log_window = NodePath("../LogWindow")
 
 [node name="SpellMenu" parent="MainMenu" instance=ExtResource("13_menu")]
 
+[node name="ItemMenu" parent="MainMenu" instance=ExtResource("13_menu")]
+
+[node name="ItemActionMenu" parent="MainMenu" instance=ExtResource("13_menu")]
+
 [node name="SpellSlots" type="Control" parent="."]
 layout_mode = 3
 anchors_preset = 3

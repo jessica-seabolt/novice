@@ -1,5 +1,5 @@
 class_name Spell extends Resource
-## What a spell covers, who it reaches there, and its effects on them
+## Defines a spell's shape, targets, cost, reach, and effects
 
 enum Shape {
     SELF,

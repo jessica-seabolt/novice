@@ -13,6 +13,8 @@ var turn_system: TurnSystem
 var floor_number: int = 1
 var mobs: Array[Entity] = []
 var hud: Hud
+# Right after the floor layers, so items draw under entities
+var _floor_items: FloorItems = FloorItems.new()
 # To tell arriving on stairs from standing on them
 var _player_last_position: Vector2i
 
@@ -22,6 +24,9 @@ var _player_last_position: Vector2i
 
 func _ready() -> void:
     config = TEST_CONFIG
+    _floor_items.name = "Items"
+    _floor_items.setup(floor_layer)
+    feature_layer.add_sibling(_floor_items)
     hud = HUD_SCENE.instantiate()
     add_child(hud)
     add_child(DamageNumbers.new())
@@ -38,9 +43,11 @@ func _start_floor() -> void:
     var ctx: GenerationContext = _generate_floor()
     floor_state = FloorState.new(ctx.grid, ctx.rooms, ctx.reachable_tiles, ctx.rng)
     floor_state.player = player
+    floor_state.items = _floor_items
     player.setup(floor_state, floor_layer, ctx.player_spawn)
     _player_last_position = ctx.player_spawn
     _spawn_mobs(ctx)
+    _spawn_items(ctx)
     turn_system.run()
 
 
@@ -72,6 +79,7 @@ func _on_entity_defeated(entity: Entity) -> void:
         await hud.show_log()
         floor_number = 1
         Stats.of(player).restore()
+        Inventory.of(player).clear()
         hud.clear_log()
         _start_floor.call_deferred()
         return
@@ -81,6 +89,7 @@ func _on_entity_defeated(entity: Entity) -> void:
     if reward > 0:
         var noun: String = "stat point" if reward == 1 else "stat points"
         hud.add_message("%s gained %d %s" % [player.display_name, reward, noun])
+    HeldItem.of(entity).drop()
     _take_off_floor(entity)
     await _vanish(entity)
     entity.queue_free()
@@ -113,13 +122,51 @@ func _spawn_player() -> void:
 
 func _spawn_mobs(ctx: GenerationContext) -> void:
     _reset_mobs()
+    if config.mob_pool.is_empty():
+        return
 
     for spawn: Vector2i in ctx.mob_spawns:
-        var mob: Entity = MOB_SCENE.instantiate()
+        var mob: Entity = _make_mob(_pick_mob())
         add_child(mob)
         mob.setup(floor_state, floor_layer, spawn)
         turn_system.add_actor(mob)
         mobs.append(mob)
+
+
+# Stats and Spellbook read the stat block when added, so it's set before then
+func _make_mob(data: MobData) -> Entity:
+    var mob: Entity = MOB_SCENE.instantiate()
+    mob.display_name = data.display_name
+    var sprite: AnimatedSprite2D = mob.get_node("AnimatedSprite2D")
+    sprite.sprite_frames = data.sprite_frames
+    sprite.play()
+    Stats.of(mob).stat_block = data.stat_block
+    return mob
+
+
+func _pick_mob() -> MobData:
+    var weights: Array[int] = []
+    for entry: MobSpawn in config.mob_pool:
+        weights.append(entry.weight)
+    return config.mob_pool[Dice.pick_weighted(weights, floor_state.rng)].mob
+
+
+func _spawn_items(ctx: GenerationContext) -> void:
+    _floor_items.clear()
+    if config.item_pool.is_empty():
+        return
+
+    for spawn: Vector2i in ctx.item_spawns:
+        _floor_items.place(_pick_item_stack(), spawn)
+
+
+func _pick_item_stack() -> ItemStack:
+    var weights: Array[int] = []
+    for entry: ItemSpawn in config.item_pool:
+        weights.append(entry.weight)
+    var entry: ItemSpawn = config.item_pool[Dice.pick_weighted(weights, floor_state.rng)]
+    var count: int = floor_state.rng.randi_range(entry.count_min, entry.count_max)
+    return ItemStack.new(entry.item, mini(count, entry.item.max_stack))
 
 
 func _reset_mobs() -> void:

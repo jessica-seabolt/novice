@@ -9,6 +9,7 @@ var astar: AStarGrid2D
 var reachable_tiles: Array[Vector2i]
 var player_spawn: Vector2i
 var mob_spawns: Array[Vector2i]
+var item_spawns: Array[Vector2i]
 
 var _next_room_id: int
 

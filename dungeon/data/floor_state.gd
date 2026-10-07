@@ -6,6 +6,7 @@ var rooms: Array[DungeonRoom]
 var reachable_tiles: Array[Vector2i]
 var rng: RandomNumberGenerator
 var occupancy: Occupancy = Occupancy.new()
+var items: FloorItems
 ## Slide time for this turn, set by the player so everything moves at their pace
 var step_duration: float = 0.15
 ## Shared 8-direction pathfinder
@@ -43,6 +44,15 @@ func _init(
     reachable_tiles = floor_reachable_tiles
     rng = floor_rng
     pathfinder = _build_pathfinder(floor_grid)
+
+
+## Open ground with no item already there; stairs stay clear
+func can_hold_item(p: Vector2i) -> bool:
+    return (
+        grid.is_ground(p)
+        and not items.has_item(p)
+        and grid.get_tile(p).feature != DungeonTile.Feature.STAIRS
+    )
 
 
 ## Waits until no entity is sliding or mid-attack

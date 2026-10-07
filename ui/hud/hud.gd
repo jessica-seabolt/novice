@@ -26,8 +26,21 @@ func _ready() -> void:
     SignalBus.mana_restored.connect(_on_mana_restored)
     SignalBus.spell_cast.connect(_on_spell_cast)
     SignalBus.cast_refused.connect(_on_cast_refused)
+    SignalBus.item_picked_up.connect(_announce.bind("%s picked up %s"))
+    SignalBus.no_room_for.connect(_on_no_room_for)
+    SignalBus.item_used.connect(_on_item_used)
+    SignalBus.item_dropped.connect(_announce.bind("%s dropped %s"))
+    SignalBus.item_equipped.connect(_announce.bind("%s equipped %s"))
     _popup_timer.timeout.connect(_popup.hide)
-    for window: Node in [_log_window, $Prompt/Menu, $MainMenu/Menu, $MainMenu/SpellMenu]:
+    var windows: Array[Node] = [
+        _log_window,
+        $Prompt/Menu,
+        $MainMenu/Menu,
+        $MainMenu/SpellMenu,
+        $MainMenu/ItemMenu,
+        $MainMenu/ItemActionMenu,
+    ]
+    for window: Node in windows:
         window.opened.connect(_on_window_opened)
         window.closed.connect(_on_window_closed)
 
@@ -106,3 +119,16 @@ func _on_spell_cast(caster: Entity, spell: Spell, _tiles: Array[Vector2i]) -> vo
 func _on_cast_refused(_caster: Entity, _spell: Spell) -> void:
     Sfx.play(SelectionMenu.BAD_SOUND)
     add_message("Not enough MP")
+
+
+# For messages about an entity and some items
+func _announce(entity: Entity, stack: ItemStack, text: String) -> void:
+    add_message(text % [entity.display_name, stack.get_label()])
+
+
+func _on_no_room_for(_entity: Entity, stack: ItemStack) -> void:
+    add_message("No room for %s" % stack.get_label())
+
+
+func _on_item_used(entity: Entity, item: ItemData) -> void:
+    add_message("%s used %s" % [entity.display_name, item.display_name])

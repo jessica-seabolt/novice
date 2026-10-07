@@ -4,7 +4,7 @@ class_name Spellbook extends Node
 signal requested(spell: Spell)
 
 ## Known by everyone
-const BASIC: Spell = preload("res://entity/spells/sp_basic.tres")
+const BASIC: Spell = preload("res://entity/spells/spell_basic.tres")
 
 var spells: Array[Spell] = []
 

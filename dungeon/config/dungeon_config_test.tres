@@ -1,9 +1,22 @@
 [gd_resource type="Resource" script_class="DungeonConfig" format=3 uid="uid://cob8tfl3l1gnx"]
 
 [ext_resource type="Script" uid="uid://ckcnwl4yosetn" path="res://dungeon/config/dungeon_config.gd" id="1_wunx1"]
+[ext_resource type="Script" path="res://dungeon/config/mob_spawn.gd" id="mob_spawn"]
+[ext_resource type="Script" path="res://dungeon/config/item_spawn.gd" id="item_spawn"]
+[ext_resource type="Resource" path="res://entity/mob/mob_data/mob_data_test.tres" id="mob_test"]
+[ext_resource type="Resource" uid="uid://ge55cxwo31h5" path="res://item/item_data/item_data_test.tres" id="item_test"]
+
+[sub_resource type="Resource" id="MobSpawn_test"]
+script = ExtResource("mob_spawn")
+mob = ExtResource("mob_test")
+
+[sub_resource type="Resource" id="ItemSpawn_test"]
+script = ExtResource("item_spawn")
+item = ExtResource("item_test")
 
 [resource]
 script = ExtResource("1_wunx1")
+display_name = "Test Dungeon"
 room_count_max = 5
 extra_hallway_count_min = 1
 extra_hallway_count_max = 10
@@ -12,4 +25,8 @@ river_count_min = 1
 river_count_max = 10
 mob_count_min = 3
 mob_count_max = 6
+mob_pool = Array[ExtResource("mob_spawn")]([SubResource("MobSpawn_test")])
+item_count_min = 2
+item_count_max = 5
+item_pool = Array[ExtResource("item_spawn")]([SubResource("ItemSpawn_test")])
 metadata/_custom_type_script = "uid://ckcnwl4yosetn"

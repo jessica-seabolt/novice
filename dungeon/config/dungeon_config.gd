@@ -6,6 +6,9 @@ enum StairDirection {
     DOWN, ## Dungeon uses basement floors
 }
 
+## The name of the dungeon for UI and dialogue
+@export var display_name: String = "Dungeon"
+
 ## Portion of FloorGrid's max size to use
 @export_range(0.0, 1.0, 0.01) var grid_usage: float = 1.0
 
@@ -52,3 +55,11 @@ enum StairDirection {
 ## Min and max mobs per floor
 @export_range(0, 100) var mob_count_min: int = 0
 @export_range(0, 100) var mob_count_max: int = 0
+## Which mobs appear, and how often
+@export var mob_pool: Array[MobSpawn] = []
+
+## Min and max items per floor
+@export_range(0, 100) var item_count_min: int = 0
+@export_range(0, 100) var item_count_max: int = 0
+## Which items appear, and how often
+@export var item_pool: Array[ItemSpawn] = []

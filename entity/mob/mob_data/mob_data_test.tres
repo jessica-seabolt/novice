@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="MobData" format=3]
+
+[ext_resource type="Script" path="res://entity/mob/mob_data/mob_data.gd" id="mob_data"]
+[ext_resource type="Texture2D" uid="uid://v3ud3ljskmyo" path="res://graphics/sprites/test_mob_sprite.png" id="sprite"]
+[ext_resource type="Resource" uid="uid://bu5ef4n6o1vwp" path="res://entity/stats/stat_block_test_entity.tres" id="stat_block"]
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_mob"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("sprite")
+}],
+"loop": true,
+"name": &"default",
+"speed": 5.0
+}]
+
+[resource]
+script = ExtResource("mob_data")
+display_name = "Mob"
+sprite_frames = SubResource("SpriteFrames_mob")
+stat_block = ExtResource("stat_block")

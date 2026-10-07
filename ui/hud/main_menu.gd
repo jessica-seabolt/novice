@@ -9,6 +9,12 @@ enum Option {
     LOG,
 }
 
+enum ItemOption {
+    USE,
+    EQUIP,
+    DROP,
+}
+
 const OPTIONS: Array[String] = ["Spells", "Items", "Stats", "Log"]
 const MARGIN: float = 4.0
 # Placeholder until there's an opening sound
@@ -19,9 +25,14 @@ const OPEN_SOUND: AudioStream = preload("res://audio/sfx/sfx_menu_select.ogg")
 var _spellbook: Spellbook
 var _player_control: PlayerControl
 var _aim_overlay: AimOverlay
+var _inventory: Inventory
+# The stack the item action menu is for
+var _chosen_stack: ItemStack
 
 @onready var _menu: SelectionMenu = $Menu
 @onready var _spell_menu: SelectionMenu = $SpellMenu
+@onready var _item_menu: SelectionMenu = $ItemMenu
+@onready var _item_action_menu: SelectionMenu = $ItemActionMenu
 
 
 func _ready() -> void:
@@ -31,6 +42,10 @@ func _ready() -> void:
     _spell_menu.highlighted.connect(_on_spell_highlighted)
     _spell_menu.chosen.connect(_on_spell_chosen)
     _spell_menu.cancelled.connect(_on_spell_menu_cancelled)
+    _item_menu.chosen.connect(_on_item_chosen)
+    _item_menu.cancelled.connect(_on_item_menu_cancelled)
+    _item_action_menu.chosen.connect(_on_item_action_chosen)
+    _item_action_menu.cancelled.connect(_on_item_action_menu_cancelled)
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -38,6 +53,7 @@ func _unhandled_input(event: InputEvent) -> void:
         return
     if event.is_action_pressed(&"open_menu"):
         Sfx.play(OPEN_SOUND)
+        _menu.set_enabled(_available_options())
         _open(_menu)
     elif event.is_action_pressed(&"toggle_log"):
         log_window.open()
@@ -50,13 +66,17 @@ func setup(player: Entity) -> void:
     _spellbook = Spellbook.of(player)
     _player_control = PlayerControl.of(player)
     _aim_overlay = AimOverlay.of(player)
+    _inventory = Inventory.of(player)
     var names: Array[String] = []
     for spell: Spell in _spellbook.spells:
         names.append(spell.display_name)
     _spell_menu.set_items(names)
-    # Greyed out until they exist
-    var available: Array[bool] = [not names.is_empty(), false, false, true]
-    _menu.set_items(OPTIONS, available)
+    _menu.set_items(OPTIONS, _available_options())
+
+
+# Stats is greyed out until it exists
+func _available_options() -> Array[bool]:
+    return [not _spellbook.spells.is_empty(), not _inventory.stacks.is_empty(), false, true]
 
 
 # In the top right corner
@@ -75,6 +95,14 @@ func _on_chosen(index: int) -> void:
             _spell_menu.set_enabled(affordable)
             _menu.close()
             _open(_spell_menu)
+        MainMenu.Option.ITEMS:
+            var labels: Array[String] = []
+            for stack: ItemStack in _inventory.stacks:
+                var held: bool = _inventory.is_equipped(stack)
+                labels.append(stack.get_label() + (" (held)" if held else ""))
+            _item_menu.set_items(labels)
+            _menu.close()
+            _open(_item_menu)
         MainMenu.Option.LOG:
             _menu.close()
             log_window.open()
@@ -96,3 +124,41 @@ func _on_spell_menu_cancelled() -> void:
     _aim_overlay.preview(null)
     _spell_menu.close()
     _menu.open()
+
+
+func _on_item_chosen(index: int) -> void:
+    _chosen_stack = _inventory.stacks[index]
+    var held: bool = _inventory.is_equipped(_chosen_stack)
+    var options: Array[String] = ["Use", "Unequip" if held else "Equip", "Drop"]
+    var available: Array[bool] = [_chosen_stack.item.is_usable(), true, _inventory.can_drop()]
+    _item_action_menu.set_items(options, available)
+    # Beside the item list, which stays up but stops taking input
+    _item_menu.set_process_unhandled_input(false)
+    _item_action_menu.position = _item_menu.position - Vector2(_item_action_menu.size.x, 0.0)
+    _item_action_menu.open()
+
+
+func _on_item_menu_cancelled() -> void:
+    _item_menu.close()
+    _menu.open()
+
+
+func _on_item_action_chosen(index: int) -> void:
+    _item_action_menu.close()
+    _item_menu.set_process_unhandled_input(true)
+    _item_menu.close()
+    match index:
+        MainMenu.ItemOption.USE:
+            _inventory.request(_chosen_stack, Inventory.Action.USE)
+        MainMenu.ItemOption.EQUIP:
+            if _inventory.is_equipped(_chosen_stack):
+                _inventory.unequip()
+            else:
+                _inventory.equip(_chosen_stack)
+        MainMenu.ItemOption.DROP:
+            _inventory.request(_chosen_stack, Inventory.Action.DROP)
+
+
+func _on_item_action_menu_cancelled() -> void:
+    _item_action_menu.close()
+    _item_menu.set_process_unhandled_input(true)
