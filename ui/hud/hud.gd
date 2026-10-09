@@ -1,13 +1,14 @@
 class_name Hud extends CanvasLayer
-## The player's bars, messages, and windows; the game pauses while any window is open
+## The player's bars, messages, and windows
 
 ## Seconds the latest message stays on screen
 const MESSAGE_DURATION: float = 3.0
-## The HUD is laid out at the world's resolution and drawn this many times larger,
-## so text has finer pixels than the art
+## The HUD is laid out at the world's resolution and drawn this many times larger
+## so text is more readable
 const SCALE: float = 2.0
 
 var _stats: Stats
+var _experience: Experience
 var _lines: Array[String] = []
 var _open_windows: int = 0
 # The popup's top edge with one line of text
@@ -23,6 +24,7 @@ var _popup_top: float
 @onready var _prompt: Prompt = $Root/Prompt
 @onready var _main_menu: MainMenu = $Root/MainMenu
 @onready var _spell_slots: SpellSlots = $Root/SpellSlots
+@onready var _stat_allocator: StatAllocator = $Root/StatAllocator
 
 
 func _ready() -> void:
@@ -34,6 +36,8 @@ func _ready() -> void:
     SignalBus.entity_defeated.connect(_on_entity_defeated)
     SignalBus.entity_healed.connect(_on_entity_healed)
     SignalBus.mana_restored.connect(_on_mana_restored)
+    SignalBus.xp_gained.connect(_on_xp_gained)
+    SignalBus.leveled_up.connect(_on_leveled_up)
     SignalBus.spell_cast.connect(_on_spell_cast)
     SignalBus.cast_refused.connect(_on_cast_refused)
     SignalBus.spell_learned.connect(_on_spell_learned)
@@ -52,13 +56,14 @@ func _ready() -> void:
         $Root/MainMenu/SpellMenu,
         $Root/MainMenu/ItemMenu,
         $Root/MainMenu/ItemActionMenu,
+        $Root/StatAllocator,
     ]
     for window: Node in windows:
         window.opened.connect(_on_window_opened)
         window.closed.connect(_on_window_closed)
 
 
-# Children see input first, so this only hears Escape when no window took it
+# Only hears Escape when no window took it
 func _unhandled_input(event: InputEvent) -> void:
     if _open_windows == 0 or not event.is_action_pressed(&"open_menu"):
         return
@@ -68,6 +73,7 @@ func _unhandled_input(event: InputEvent) -> void:
 
 func setup(player: Entity) -> void:
     _stats = Stats.of(player)
+    _experience = Experience.of(player)
     _stats.changed.connect(_refresh)
     _refresh()
     _main_menu.setup(player)
@@ -75,8 +81,10 @@ func setup(player: Entity) -> void:
 
 
 func add_message(text: String) -> void:
-    _lines.append(text)
-    _log_window.set_lines(_lines)
+    _log(text)
+    # Only the log hears about it while a window is open
+    if _open_windows > 0:
+        return
     _popup_text.text = text
     var extra_lines: int = maxi(0, _popup_text.get_line_count() - 1)
     var line_height: int = (
@@ -90,9 +98,15 @@ func add_message(text: String) -> void:
 ## Every window closes as if cancelled
 func close_all() -> void:
     _main_menu.close_all()
+    _stat_allocator.cancel()
     _prompt.cancel()
     if _log_window.visible:
         _log_window.close()
+
+
+## Waits until the player has spent every stat point
+func level_up() -> void:
+    await _stat_allocator.edit(_stats, _experience, true)
 
 
 ## Opens the full log and waits until the player closes it
@@ -112,10 +126,16 @@ func clear_log() -> void:
     _log_window.set_lines(_lines)
 
 
-# Anchors ignore the layer's scale, so the root is sized by hand
+# Anchors ignore the layer's scale
 func _fit_root() -> void:
     _root.scale = Vector2(SCALE, SCALE)
     _root.size = get_viewport().get_visible_rect().size / SCALE
+
+
+# Kept in the log without popping up
+func _log(text: String) -> void:
+    _lines.append(text)
+    _log_window.set_lines(_lines)
 
 
 func _on_window_opened() -> void:
@@ -145,6 +165,15 @@ func _on_entity_defeated(entity: Entity) -> void:
 
 func _on_entity_healed(entity: Entity, amount: int) -> void:
     add_message("%s recovered %d HP" % [entity.display_name, amount])
+
+
+func _on_xp_gained(entity: Entity, amount: int) -> void:
+    add_message("%s gained %d XP" % [entity.display_name, amount])
+
+
+func _on_leveled_up(entity: Entity, level: int) -> void:
+    var text: String = "%s reached level %d and earned %d stat points"
+    _log(text % [entity.display_name, level, Experience.POINTS_PER_LEVEL])
 
 
 func _on_mana_restored(entity: Entity, amount: int) -> void:

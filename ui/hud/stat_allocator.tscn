@@ -1,0 +1,68 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://ui/hud/stat_allocator.gd" id="1_script"]
+[ext_resource type="PackedScene" path="res://ui/window_frame.tscn" id="2_frame"]
+[ext_resource type="Texture2D" uid="uid://cm2onbsj2ey1j" path="res://graphics/ui/cursor.png" id="3_cursor"]
+
+[node name="StatAllocator" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("1_script")
+
+[node name="Panel" type="Control" parent="."]
+layout_mode = 0
+anchors_preset = 0
+mouse_filter = 2
+
+[node name="Frame" parent="Panel" instance=ExtResource("2_frame")]
+layout_mode = 1
+
+[node name="Content" type="MarginContainer" parent="Panel"]
+layout_mode = 0
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 7
+theme_override_constants/margin_right = 9
+theme_override_constants/margin_bottom = 7
+
+[node name="Rows" type="VBoxContainer" parent="Panel/Content"]
+layout_mode = 2
+theme_override_constants/separation = 3
+
+[node name="Title" type="Label" parent="Panel/Content/Rows"]
+layout_mode = 2
+
+[node name="Points" type="Label" parent="Panel/Content/Rows"]
+layout_mode = 2
+
+[node name="Stats" type="GridContainer" parent="Panel/Content/Rows"]
+layout_mode = 2
+theme_override_constants/h_separation = 4
+theme_override_constants/v_separation = 3
+columns = 4
+
+[node name="Confirm" type="Button" parent="Panel/Content/Rows"]
+layout_mode = 2
+size_flags_horizontal = 0
+text = "Confirm"
+flat = true
+
+[node name="Cursor" type="Sprite2D" parent="Panel"]
+rotation = -1.5707964
+texture = ExtResource("3_cursor")
+
+[node name="Info" type="Control" parent="."]
+layout_mode = 0
+anchors_preset = 0
+mouse_filter = 2
+
+[node name="Frame" parent="Info" instance=ExtResource("2_frame")]
+layout_mode = 1
+
+[node name="Description" type="Label" parent="Info"]
+layout_mode = 0
+autowrap_mode = 3

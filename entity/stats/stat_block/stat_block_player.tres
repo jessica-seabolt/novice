@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="StatBlock" format=3 uid="uid://m5te562q5y83"]
+
+[ext_resource type="Script" uid="uid://djf0j5cmysu4l" path="res://entity/stats/stat_block/stat_block.gd" id="1_vx3v1"]
+[ext_resource type="Script" uid="uid://b8dxsn2nja4a5" path="res://entity/spells/spell.gd" id="2_gah3f"]
+
+[resource]
+script = ExtResource("1_vx3v1")
+max_hp = 50
+max_mana = 20
+metadata/_custom_type_script = "uid://djf0j5cmysu4l"

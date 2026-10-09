@@ -1,6 +1,5 @@
 class_name SelectionMenu extends Control
-## A framed list of options with a cursor, sized to fit, that handles its own input;
-## the cursor skips greyed-out options
+## A framed list of options with a cursor, sized to fit, that handles its own input
 
 signal opened
 signal closed
@@ -45,16 +44,15 @@ var _scroll_time: float = 0.0
 func _ready() -> void:
     process_mode = Node.PROCESS_MODE_ALWAYS
     _rows.add_theme_constant_override(&"separation", row_gap)
+    # Rows are laid out after _process, so new ones would put the cursor in the wrong place
+    _rows.sort_children.connect(_place_cursor)
     hide()
 
 
 func _process(delta: float) -> void:
-    _cursor.visible = _index != NO_SELECTION
+    _place_cursor()
     if not visible or _index == NO_SELECTION:
         return
-    var row: Control = _rows.get_child(_index) as Control
-    var centre_y: float = _content.position.y + _rows.position.y + row.position.y + row.size.y / 2.0
-    _cursor.position = Vector2(CURSOR_X, roundf(centre_y))
     _scroll_time += delta
     _scroll_highlighted()
 
@@ -109,6 +107,17 @@ func set_enabled(enabled: Array[bool]) -> void:
         select_first()
 
 
+## NO_SELECTION if every option is greyed out
+func get_selected() -> int:
+    return _index
+
+
+## Moves the cursor to an option, unless it's greyed out
+func select(index: int) -> void:
+    if index >= 0 and index < _enabled.size() and _enabled[index]:
+        _highlight(index)
+
+
 func select_first() -> void:
     _highlight(_enabled.find(true))
 
@@ -124,6 +133,15 @@ func open() -> void:
 func close() -> void:
     hide()
     closed.emit()
+
+
+func _place_cursor() -> void:
+    _cursor.visible = _index != NO_SELECTION
+    if _index == NO_SELECTION or _index >= _rows.get_child_count():
+        return
+    var row: Control = _rows.get_child(_index) as Control
+    var centre_y: float = _content.position.y + _rows.position.y + row.position.y + row.size.y / 2.0
+    _cursor.position = Vector2(CURSOR_X, roundf(centre_y))
 
 
 # A row is an optional icon, then the text in a box that cuts it short

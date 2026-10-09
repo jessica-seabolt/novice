@@ -1,5 +1,5 @@
 class_name ItemInfo extends Control
-## An item's full name and description, at the bottom of the screen; grows upward to fit
+## A title and description at the bottom of the screen
 
 ## Pixels between the frame and the text
 const PADDING: Vector2 = Vector2(8.0, 7.0)
@@ -15,10 +15,12 @@ func _ready() -> void:
 
 
 func show_item(stack: ItemStack, held: bool) -> void:
-    _name.text = stack.get_label()
-    _description.text = stack.item.description
-    if held:
-        _description.text = "Held. " + _description.text
+    show_text(stack.get_label(), ("Held. " if held else "") + stack.item.description)
+
+
+func show_text(title: String, description: String) -> void:
+    _name.text = title
+    _description.text = description
     _description.visible = not _description.text.is_empty()
     var bottom: float = _place(_name, PADDING.y)
     if _description.visible:

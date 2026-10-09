@@ -35,12 +35,17 @@ NoVice is a top-down roguelike dungeon crawler. Players will travel through dung
 - [x] Mana
 - [x] Items and item spawning
 - [x] Spell scrolls
-- [ ] Spending stat points
+- [x] Spending stat points
+- [ ] Spell schools
+- [ ] Perk system / stat rework / XP balancing
 - [ ] Traps and trap spawning
 - [ ] Minimap
 - [ ] Music
 - [ ] Dialogue
 - [ ] Allies
+- [ ] Destructible dungeon tiles / hidden items
+- [ ] Party rooms
+- [ ] Boss rooms
 
 ## Credits
 - [Alagard](https://www.dafont.com/alagard.font) font by Hewett Tsoi

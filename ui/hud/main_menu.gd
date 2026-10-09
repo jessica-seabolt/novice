@@ -1,6 +1,5 @@
 class_name MainMenu extends Control
-## The menu opened on the player's turn, leading to spells, items, stats and the log;
-## also opens the log directly
+## The menu opened on the player's turn, leading to spells, items, stats and the log
 
 enum Option {
     SPELLS,
@@ -21,15 +20,19 @@ const MARGIN: float = 4.0
 const OPEN_SOUND: AudioStream = preload("res://audio/sfx/sfx_menu_select.ogg")
 
 @export var log_window: LogWindow
+@export var stat_allocator: StatAllocator
 
 var _spellbook: Spellbook
 var _player_control: PlayerControl
 var _aim_overlay: AimOverlay
 var _inventory: Inventory
+var _stats: Stats
+var _experience: Experience
 # The stack the item action menu is for
 var _chosen_stack: ItemStack
-# Whether closing the log goes back to this menu
+# Whether closing the log or stats goes back to this menu
 var _log_from_menu: bool = false
+var _stats_from_menu: bool = false
 
 @onready var _menu: SelectionMenu = $Menu
 @onready var _spell_menu: SelectionMenu = $SpellMenu
@@ -73,12 +76,15 @@ func setup(player: Entity) -> void:
     _player_control = PlayerControl.of(player)
     _aim_overlay = AimOverlay.of(player)
     _inventory = Inventory.of(player)
+    _stats = Stats.of(player)
+    _experience = Experience.of(player)
     _menu.set_items(OPTIONS, _available_options())
 
 
-## Closes any of its menus that are open, tidying up as cancelling would
+## Closes any of its menus that are open
 func close_all() -> void:
     _log_from_menu = false
+    _stats_from_menu = false
     _aim_overlay.preview(null)
     _item_menu.set_process_unhandled_input(true)
     for menu: SelectionMenu in [_menu, _spell_menu, _item_menu, _item_action_menu]:
@@ -86,9 +92,8 @@ func close_all() -> void:
             menu.close()
 
 
-# Stats is greyed out until it exists
 func _available_options() -> Array[bool]:
-    return [not _spellbook.spells.is_empty(), not _inventory.stacks.is_empty(), false, true]
+    return [not _spellbook.spells.is_empty(), not _inventory.stacks.is_empty(), true, true]
 
 
 # In the top right corner
@@ -119,6 +124,13 @@ func _on_chosen(index: int) -> void:
             _item_menu.set_items(labels, [], icons)
             _menu.close()
             _open(_item_menu)
+        MainMenu.Option.STATS:
+            _menu.close()
+            _stats_from_menu = true
+            await stat_allocator.edit(_stats, _experience, false)
+            if _stats_from_menu:
+                _stats_from_menu = false
+                _menu.open()
         MainMenu.Option.LOG:
             _menu.close()
             _log_from_menu = true

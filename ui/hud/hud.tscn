@@ -15,6 +15,7 @@
 [ext_resource type="Script" uid="uid://bgkgt7m2yt5fn" path="res://ui/hud/main_menu.gd" id="14_main_menu"]
 [ext_resource type="Script" uid="uid://dukbwpnbrjnnx" path="res://ui/hud/spell_slots.gd" id="15_spell_slots"]
 [ext_resource type="Script" uid="uid://cyu1exdarkqrf" path="res://ui/hud/item_info.gd" id="16_item_info"]
+[ext_resource type="PackedScene" path="res://ui/hud/stat_allocator.tscn" id="18_stat_allocator"]
 
 [node name="Hud" type="CanvasLayer" unique_id=942269427]
 script = ExtResource("1_hud")
@@ -159,7 +160,7 @@ vertical_alignment = 1
 [node name="Menu" parent="Root/Prompt" unique_id=675203592 instance=ExtResource("13_menu")]
 layout_mode = 0
 
-[node name="MainMenu" type="Control" parent="Root" unique_id=1163660438 node_paths=PackedStringArray("log_window")]
+[node name="MainMenu" type="Control" parent="Root" unique_id=1163660438 node_paths=PackedStringArray("log_window", "stat_allocator")]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -169,6 +170,7 @@ grow_vertical = 2
 mouse_filter = 2
 script = ExtResource("14_main_menu")
 log_window = NodePath("../LogWindow")
+stat_allocator = NodePath("../StatAllocator")
 
 [node name="Menu" parent="Root/MainMenu" unique_id=1978979522 instance=ExtResource("13_menu")]
 layout_mode = 0
@@ -241,3 +243,6 @@ theme_override_constants/margin_bottom = 7
 layout_mode = 2
 mouse_filter = 2
 theme_override_constants/separation = 4
+
+[node name="StatAllocator" parent="Root" instance=ExtResource("18_stat_allocator")]
+layout_mode = 1

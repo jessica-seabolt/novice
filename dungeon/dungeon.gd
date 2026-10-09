@@ -50,10 +50,14 @@ func _start_floor() -> void:
     turn_system.run()
 
 
-# Asked once the round comes back to the player, so mobs get to act first
+# Level ups and the stairs are asked about once the round comes back to the player,
+# so mobs get to act first
 func _before_turn(actor: Entity) -> void:
     if actor != player:
         return
+    if Stats.of(player).stat_points > 0:
+        await floor_state.wait_for_slides()
+        await hud.level_up()
     var arrived: bool = player.grid_position != _player_last_position
     _player_last_position = player.grid_position
     if not arrived:
@@ -78,17 +82,14 @@ func _on_entity_defeated(entity: Entity) -> void:
         await hud.show_log()
         floor_number = 1
         Stats.of(player).restore()
+        Experience.of(player).reset()
         Inventory.of(player).clear()
         Spellbook.of(player).reset()
         hud.clear_log()
         _start_floor.call_deferred()
         return
 
-    var reward: int = Stats.of(entity).stat_block.stat_point_reward
-    Stats.of(player).stat_points += reward
-    if reward > 0:
-        var noun: String = "stat point" if reward == 1 else "stat points"
-        hud.add_message("%s gained %d %s" % [player.display_name, reward, noun])
+    Experience.of(player).gain(Stats.of(entity).stat_block.xp_reward)
     HeldItem.of(entity).drop()
     _take_off_floor(entity)
     await _vanish(entity)

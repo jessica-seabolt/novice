@@ -4,9 +4,10 @@
 [ext_resource type="Script" uid="uid://dg5llvtgjj0qd" path="res://entity/entity.gd" id="1_entity"]
 [ext_resource type="Texture2D" uid="uid://2jb32pypqpnd" path="res://graphics/sprites/test_player.png" id="2_4pl66"]
 [ext_resource type="Script" uid="uid://tq1r1qm7dgmk" path="res://entity/stats/stats.gd" id="4_bgq54"]
-[ext_resource type="Resource" uid="uid://m5te562q5y83" path="res://entity/stats/stat_block_player.tres" id="5_482rp"]
+[ext_resource type="Resource" uid="uid://m5te562q5y83" path="res://entity/stats/stat_block/stat_block_player.tres" id="5_482rp"]
 [ext_resource type="Script" uid="uid://cs3v3fjlex8ed" path="res://entity/player/aim_overlay.gd" id="6_aim"]
 [ext_resource type="Script" uid="uid://ddxd0imvbaxvp" path="res://entity/damage_flicker.gd" id="7_flicker"]
+[ext_resource type="Script" uid="uid://dqw5w3yg2qidc" path="res://entity/stats/experience.gd" id="experience"]
 [ext_resource type="Script" uid="uid://cndel135eskxf" path="res://item/held_item.gd" id="held_item"]
 [ext_resource type="Script" uid="uid://5yvv5oxv0uta" path="res://item/inventory.gd" id="inventory"]
 [ext_resource type="Script" uid="uid://ct2k1toycwoma" path="res://entity/spells/spellbook.gd" id="spellbook"]
@@ -56,3 +57,6 @@ script = ExtResource("inventory")
 
 [node name="HeldItem" type="Node" parent="." unique_id=755213264]
 script = ExtResource("held_item")
+
+[node name="Experience" type="Node" parent="." unique_id=1547830011]
+script = ExtResource("experience")
